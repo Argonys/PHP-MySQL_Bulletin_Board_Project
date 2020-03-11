@@ -1,4 +1,5 @@
 <?php
+session_start();
 // On inclut le fichier de connexion à la database
 require_once 'config.php';
 
@@ -41,13 +42,12 @@ if(isset($_POST['login'])) {
         
         // On prépare la requête
         $req = $bdd->prepare($sql);
-
         $req->bindValue(':email', $email);
 
         // On essaie d'exécuter la requête
         $req->execute();
 
-        // On récupère ce que vous renvoie la requête
+        // On récupère ce que nous renvoie la requête
         $userData = $req->fetch(PDO::FETCH_ASSOC);
 
         // On vérifie si l'email rentré correspond à celui de la database
@@ -56,7 +56,6 @@ if(isset($_POST['login'])) {
             // Si oui, on vérifie si les passwords correspondent (sort true ou false)
             if(password_verify($password, $userData['password'])) {
 
-                session_start();
                 // On save les données de l'user dans la variable $_SESSION
                 $_SESSION = $userData;
                 $_SESSION['logged_in'] = "Vous êtes maintenant connecté.";
@@ -81,7 +80,7 @@ if(isset($_POST['login'])) {
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-            <link rel="stylesheet" href="signin.css">
+            <link rel="stylesheet" href="css/login.css">
         </head>
 
         <body>

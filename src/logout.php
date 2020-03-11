@@ -8,6 +8,7 @@ require_once "config.php";
 if (isset($_GET['logout'])) {
     session_destroy();
     session_unset();
+    unset($_SESSION['logged_in']);
     header('location: index.php');
 }
 ?>

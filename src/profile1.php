@@ -176,7 +176,6 @@ if (isset($_POST['change_password'])) {
                         <textarea placeholder="Write your signature here.." class="form-control" rows="7" id="signature"></textarea>
                         <button class="btn-success btn-sm mx-auto mt-2" style="width:20%" type=" button"><a class="text-white text-decoration-none">Submit</a> </button>
                     </div>
-
                 </div>
             </div>
         </div>

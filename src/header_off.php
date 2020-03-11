@@ -9,9 +9,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/header_off.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="css/header_off.css">
     </head> 
     <body>
         <nav class="navbar navbar-default navbar-expand-lg navbar-light">
@@ -27,11 +27,11 @@
             <!-- Collection of nav links, forms, and other content for toggling -->
             <div id="navbarCollapse" class="collapse navbar-collapse justify-content-start">
                 <ul class="nav navbar-nav">
-                    <li class="nav-item active"><a href="#" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">General</a></li>			
-                    <li class="nav-item"><a href="#" class="nav-link">Developpement</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Small talk</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Events</a></li>
+                    <li class="nav-item active px-3"><a href="index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item px-3"><a href="board_general.php" class="nav-link">General</a></li>			
+                    <li class="nav-item px-3"><a href="board_development.php" class="nav-link">Developpement</a></li>
+                    <li class="nav-item px-3"><a href="board_talks.php" class="nav-link">Small talk</a></li>
+                    <li class="nav-item px-3"><a href="board_events.php" class="nav-link">Events</a></li>
                 </ul>
                 <form class="navbar-form form-inline">
                     <div class="input-group search-box">								
