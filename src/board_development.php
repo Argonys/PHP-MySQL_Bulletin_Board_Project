@@ -2,8 +2,42 @@
 
 session_start();
 require "config.php";
-require "logout.php";
 
+
+
+
+// Script pour création de nouveau topic
+if(isset($_POST['new_topic'])) {
+    $topic_title = $_POST['topic_title'];
+    $topic_description = $_POST['topic_description'];
+    $creation_date = date('Y-m-d H:i:s');
+    $board_id = 2;
+    $user_id = $_SESSION['idusers'];
+
+    // Ajout du topic dans la base de données
+    $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
+    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+    $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
+    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+    $req->bindValue(':boards_idboards', $board_id);
+    $req->bindValue(':users_idusers', $user_id);
+    $req->execute();
+
+    // Récupération de l'id du topic créé
+    $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
+    $req->execute();
+    $topic_id = $req->fetch(PDO::FETCH_ASSOC);
+    var_dump($topic_id);
+
+    // Ajout du premier message du topic dans la base de données
+
+    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
+    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+    $req->bindValue(':users_idusers', $user_id);
+    $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
+    $req->execute();
+}
 ?>
 
 
@@ -25,7 +59,7 @@ require "logout.php";
     <script type="text/javascript" src="profile.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="profile.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
     <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>

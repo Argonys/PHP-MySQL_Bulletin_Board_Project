@@ -1,9 +1,11 @@
 body {
     font-family: "Varela Round", sans-serif;
 }
+
 .navbar-header.col {
     padding: 0 !important;
 }
+
 .navbar {
     background: #fff;
     padding-left: 16px;
@@ -11,6 +13,7 @@ body {
     border-bottom: 1px solid #dfe3e8;
     border-radius: 0;
 }
+
 .nav-link img {
     border-radius: 50%;
     width: 36px;
@@ -19,6 +22,7 @@ body {
     float: left;
     margin-right: 10px;
 }
+
 .navbar .navbar-brand,
 .navbar .navbar-brand:hover,
 .navbar .navbar-brand:focus {
@@ -26,28 +30,35 @@ body {
     font-size: 20px;
     padding-right: 50px;
 }
+
 .navbar .navbar-brand b {
     font-weight: bold;
     color: #5c6ac4;
 }
+
 .navbar .form-inline {
     display: inline-block;
 }
+
 .navbar ul.nav li {
     position: relative;
 }
+
 .navbar ul.nav li a {
     color: #888;
 }
+
 .search-box {
     position: relative;
 }
+
 .search-box input {
     padding-right: 35px;
     border-color: #dfe3e8;
     border-radius: 4px !important;
     box-shadow: none;
 }
+
 .search-box .input-group-addon {
     min-width: 35px;
     border: none;
@@ -58,10 +69,12 @@ body {
     padding: 7px;
     height: 100%;
 }
+
 .search-box i {
     color: #a0a5b1;
     font-size: 19px;
 }
+
 .navbar .nav .btn-primary,
 .navbar .nav .btn-primary:active {
     color: #fff;
@@ -74,26 +87,32 @@ body {
     min-width: 120px;
     margin-top: 8px;
 }
+
 .navbar .navbar-right li:first-child a {
     padding-right: 30px;
 }
+
 .navbar .nav .btn-primary:hover,
 .navbar .nav .btn-primary:focus {
     color: #fff;
     outline: none;
     background: #5765c1;
 }
+
 .search-box .btn span {
     transform: scale(0.9);
     display: inline-block;
 }
+
 .navbar .nav-item i {
     font-size: 18px;
 }
+
 .navbar .dropdown-item i {
     font-size: 16px;
     min-width: 22px;
 }
+
 .navbar ul.nav li.active a,
 .navbar ul.nav li.open > a {
     background: transparent !important;

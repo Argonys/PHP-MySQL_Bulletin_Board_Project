@@ -5,8 +5,9 @@ $user = 'root';
 $password = 'root';
 
 
-// Formatage de la date par défaut
-date_default_timezone_set('UTC+1');
+
+date_default_timezone_set('Europe/Brussels');
+
 
 // Connexion à la database
 try {

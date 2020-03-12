@@ -10,16 +10,16 @@
                     <h5 class="text-uppercase">boards</h5>
                     <ul class="list-unstyled">
                         <li>
-                            <a href="#!">Link 1</a>
+                            <a href="board_general.php">General</a>
                         </li>
                         <li>
-                            <a href="#!">Link 2</a>
+                            <a href="board_development.php">Development</a>
                         </li>
                         <li>
-                            <a href="#!">Link 3</a>
+                            <a href="board_talks.php">Small Talks</a>
                         </li>
                         <li>
-                            <a href="#!">Link 4</a>
+                            <a href="board_events.php">Events</a>
                         </li>
                     </ul>
                 </div>

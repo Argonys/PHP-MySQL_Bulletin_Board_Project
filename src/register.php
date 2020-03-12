@@ -5,7 +5,7 @@ session_start();
 require_once "config.php";
 
 
-date_default_timezone_set('Europe/Brussels');
+// date_default_timezone_set('Europe/Brussels');
 
 
 // Si l'user est déjà connecté, on le redirige vers la page d'accueil

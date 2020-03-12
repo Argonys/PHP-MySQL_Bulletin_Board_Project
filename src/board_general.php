@@ -2,8 +2,40 @@
 
 session_start();
 require "config.php";
-require "logout.php";
 
+
+// Script pour création de nouveau topic
+if(isset($_POST['new_topic'])) {
+    $topic_title = $_POST['topic_title'];
+    $topic_description = $_POST['topic_description'];
+    $creation_date = date('Y-m-d H:i:s');
+    $board_id = 1;
+    $user_id = $_SESSION['idusers'];
+
+    // Ajout du topic dans la base de données
+    $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
+    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+    $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
+    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+    $req->bindValue(':boards_idboards', $board_id);
+    $req->bindValue(':users_idusers', $user_id);
+    $req->execute();
+
+    // Récupération de l'id du topic créé
+    $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
+    $req->execute();
+    $topic_id = $req->fetch(PDO::FETCH_ASSOC);
+    var_dump($topic_id);
+
+    // Ajout du premier message du topic dans la base de données
+
+    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
+    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+    $req->bindValue(':users_idusers', $user_id);
+    $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
+    $req->execute();
+}
 ?>
 
 
@@ -12,7 +44,7 @@ require "logout.php";
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -23,7 +55,10 @@ require "logout.php";
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="profile1.css" media="all" />
+    <script type="text/javascript" src="profile.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
     <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>
@@ -88,21 +123,29 @@ require "logout.php";
                 <div class="row">
                         <?php 
                             $sql = 'SELECT * FROM topics
-                            INNER JOIN messages ON idtopics = messages.topics_idtopics
-                            WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
-                            GROUP BY idtopics
-                            ORDER BY messages.creation_date DESC
-                            LIMIT 9';
+                                    INNER JOIN messages ON idtopics = messages.topics_idtopics
+                                    WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
+                                    GROUP BY idtopics
+                                    ORDER BY messages.creation_date DESC
+                                    LIMIT 9';
                             $req = $bdd->prepare($sql);
                             $req->execute();
                             $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                             foreach($board1_topics as $board1_topic) {
+                                // Requête pour récupérer l'username de l'auteur du topic
+                                $sqlGetAuthor = 'SELECT username FROM users
+                                WHERE idusers = :idusers';
+                                $req = $bdd->prepare($sqlGetAuthor);
+                                $req->bindValue(':idusers', $board1_topic['users_idusers']);
+                                $req->execute();
+                                $author = $req->fetch(PDO::FETCH_ASSOC);
+
                                 echo '<div class="col-md-4 pb-5">';
                                 echo '<div class="card mb bg-light">';
                                 echo '<div class="card-body mb">';
                                 echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
                                 echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>AUTEUR ICI' . $board1_topic['creation_date'] . '</small></p>';
+                                echo '<p class="card-text"><small>' . $author['username'] . '-' . $board1_topic['creation_date'] . '</small></p>';
                                 echo '<button type="button" class="btn btn-primary mb">Read more</button>';
                                 echo '</div>';
                                 echo '</div>';
@@ -132,14 +175,16 @@ require "logout.php";
                 <div class="row border pl-3 py-5 bg-light" id="row_style">
                     <h4 class="text-center text-secondary font-weight-bold">Create a topic <i class="fa fa-arrow-circle-right"></i></h4>
                     <div class="pl-5">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Title">
-                        </div>
-                        <textarea id="editor" cols="30" rows="10"></textarea>
-                        <br>
-                        <div class="form-group">
-                            <button class="btn btn-primary" id="submit">Create</button>
-                        </div>
+                        <form method="POST" action="">
+                            <div class="form-group">
+                                <input type="text" name="topic_title" class="form-control" placeholder="Title">
+                            </div>
+                            <textarea name="topic_description" id="editor" cols="30" rows="10"></textarea>
+                            <br>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" name="new_topic" id="submit">Create</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

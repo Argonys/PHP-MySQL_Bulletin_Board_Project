@@ -1,6 +1,6 @@
 <!DOCTYPE html>
     <html lang="en">
-        <head>
+        <!-- <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
             <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,7 +15,7 @@
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
             <link rel="stylesheet" href="css/header_on.css">
-        </head> 
+        </head>  -->
         <body>
             <nav class="navbar navbar-default navbar-expand-lg navbar-light">
                 <div class="navbar-header d-flex col">
@@ -52,7 +52,7 @@
                                 <li><a href="#" class="dropdown-item text-center">Change signature</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item pt-2"><a href="index.php?logout='true'" class="btn btn-primary mt-1 mb-1">Log out</a></li>
+                        <li class="nav-item pt-2"><a href="logout.php" class="btn btn-primary mt-1 mb-1">Log out</a></li>
                     </ul>
                 </div>
             </nav>
