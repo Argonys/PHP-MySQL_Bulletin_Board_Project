@@ -60,8 +60,6 @@ if (isset($_POST['change_username'])) {
 }
 
 
-
-
 // Changement de password
 if (isset($_POST['change_password'])) {
 
@@ -74,11 +72,9 @@ if (isset($_POST['change_password'])) {
         if($new_password === $confirm_new_password) {
             $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
             $sql = 'UPDATE users SET password = :new_password WHERE email LIKE :email';
-            // On prépare la requête
             $req = $bdd->prepare($sql);
             $req->bindValue(':new_password', $new_hashed_password);
             $req->bindValue(':email', $_SESSION['email']);
-            // On essaie d'exécuter la requête
             $req->execute();
             $_SESSION['password'] = $new_hashed_password;
             header('location: profile1.php');
@@ -89,6 +85,22 @@ if (isset($_POST['change_password'])) {
         echo "You didn't write well your current password.";
     }
 }
+
+
+// Changement de signature
+if(isset($_POST['change_signature'])) {
+    $new_signature = $_POST['new_signature'];
+    // On prépare les options de la requête (requête préparée)
+    $sql = 'UPDATE users SET signature = :new_signature WHERE email LIKE :email';
+    $req = $bdd->prepare($sql);
+    $req->bindValue(':new_signature', $new_signature);
+    $req->bindValue(':email', $_SESSION['email']);
+    $resp = $req -> execute();
+    // On garde en session sa nouvelle signature et on le renvoie sur la page profile.
+    $_SESSION['new_signature'] = $new_signature;
+    header('location: profile1.php');
+}
+
 
 
 
@@ -185,8 +197,10 @@ if (isset($_POST['change_password'])) {
                                     <a data-toggle="collapse" href="#collapseSignature" role="button" aria-expanded="false" aria-controls="collapseExample" id="logo1" class="fa fa-pencil pl-4"></a>
                             </label>
                         </div>
-                        <textarea placeholder="Write your signature here.." class="form-control" rows="7" id="signature"></textarea>
-                        <button class="btn-success btn-sm mx-auto mt-2" style="width:20%" type=" button"><a class="text-white text-decoration-none">Submit</a> </button>
+                        <form action="" method="POST">
+                            <textarea placeholder="Write your signature here.." class="form-control" name="new_signature" rows="7" id="signature"><?php echo($_SESSION['new_signature']); ?></textarea>
+                            <button class="btn-success btn-sm mx-auto mt-2" style="width:20%" name="change_signature" type="submit"><a class="text-white text-decoration-none">Submit</a> </button>
+                        </form>
                     </div>
                 </div>
             </div>

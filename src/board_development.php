@@ -27,7 +27,6 @@ if(isset($_POST['new_topic'])) {
     $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
     $req->execute();
     $topic_id = $req->fetch(PDO::FETCH_ASSOC);
-    var_dump($topic_id);
 
     // Ajout du premier message du topic dans la base de données
 
@@ -124,26 +123,34 @@ if(isset($_POST['new_topic'])) {
                 <div class="row">
                         <?php 
                             $sql = 'SELECT * FROM topics
-                            INNER JOIN messages ON idtopics = messages.topics_idtopics
-                            WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 2)
-                            GROUP BY idtopics
-                            ORDER BY messages.creation_date DESC
-                            LIMIT 9';
+                                    INNER JOIN messages ON idtopics = messages.topics_idtopics
+                                    WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 2)
+                                    GROUP BY idtopics
+                                    ORDER BY messages.creation_date DESC
+                                    LIMIT 9';
                             $req = $bdd->prepare($sql);
                             $req->execute();
-                            $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            foreach($board1_topics as $board1_topic) {
+                            $board2_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                            foreach($board2_topics as $board2_topic) {
+                                // Requête pour récupérer l'username de l'auteur du topic
+                                $sqlGetAuthor = 'SELECT username FROM users
+                                WHERE idusers = :idusers';
+                                $req = $bdd->prepare($sqlGetAuthor);
+                                $req->bindValue(':idusers', $board2_topic['users_idusers']);
+                                $req->execute();
+                                $author = $req->fetch(PDO::FETCH_ASSOC);
+
                                 echo '<div class="col-md-4 pb-5">';
                                 echo '<div class="card mb bg-light">';
                                 echo '<div class="card-body mb">';
-                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
-                                echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>AUTEUR ICI' . $board1_topic['creation_date'] . '</small></p>';
+                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board2_topic['title'] . '</h5>';
+                                echo '<p class="card-text">' . $board2_topic['content'] . '</p>';
+                                echo '<p class="card-text"><small>' . $author['username'] . '-' . $board2_topic['creation_date'] . '</small></p>';
                                 echo '<button type="button" class="btn btn-primary mb">Read more</button>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
-                            } 
+                            }
                         ?>
                 </div>
             </div>
@@ -169,12 +176,16 @@ if(isset($_POST['new_topic'])) {
                     <h4 class="text-center text-secondary font-weight-bold">Create a topic <i class="fa fa-arrow-circle-right"></i></h4>
                     <div class="pl-5">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Title">
-                        </div>
-                        <textarea id="editor" cols="30" rows="10"></textarea>
-                        <br>
-                        <div class="form-group">
-                            <button class="btn btn-primary" id="submit">Create</button>
+                            <form method="POST" action="">
+                                <div class="form-group">
+                                    <input type="text" name="topic_title" class="form-control" placeholder="Title">
+                                </div>
+                                <textarea name="topic_description" id="editor" cols="30" rows="10"></textarea>
+                                <br>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit" name="new_topic" id="submit">Create</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

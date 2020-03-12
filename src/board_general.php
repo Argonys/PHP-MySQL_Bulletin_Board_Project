@@ -25,7 +25,6 @@ if(isset($_POST['new_topic'])) {
     $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
     $req->execute();
     $topic_id = $req->fetch(PDO::FETCH_ASSOC);
-    var_dump($topic_id);
 
     // Ajout du premier message du topic dans la base de données
 
@@ -131,6 +130,7 @@ if(isset($_POST['new_topic'])) {
                             $req = $bdd->prepare($sql);
                             $req->execute();
                             $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                            var_dump($board1_topics);
                             foreach($board1_topics as $board1_topic) {
                                 // Requête pour récupérer l'username de l'auteur du topic
                                 $sqlGetAuthor = 'SELECT username FROM users
@@ -146,7 +146,7 @@ if(isset($_POST['new_topic'])) {
                                 echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
                                 echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
                                 echo '<p class="card-text"><small>' . $author['username'] . '-' . $board1_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<a href="topic.php?idtopic=' . $board1_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
