@@ -1,7 +1,10 @@
 <?php 
 
 session_start();
-require "config.php";
+require "config.php";   
+
+date_default_timezone_set('Europe/Brussels');
+
 
 // Script pour la date de création du compte en format jour-mois-année
 if (isset($_SESSION['logged_in'])) {
@@ -9,134 +12,48 @@ if (isset($_SESSION['logged_in'])) {
     $req = $bdd->prepare($sql);
     $req->bindValue(':email', $_SESSION['email']);
     $req->execute();
-    $userData = $req->fetch(PDO::FETCH_ASSOC);
-    $_SESSION['idusers'] = $userData['idusers'];
+    $user_data = $req->fetch(PDO::FETCH_ASSOC);
+    $_SESSION['idusers'] = $user_data['idusers'];
+    var_dump($user_data);
     // Création de creation_date en format jour-mois-année dans la variable $_SESSION
     $_SESSION['creation_date'] = date('d-m-Y', strtotime($_SESSION["time_creation"]));
-}
 
 
-
-// Script pour avatar et envoi dans la base de données
-$email = $_SESSION['email'];
-function get_gravatar(
+    // Script pour avatar et envoi dans la base de données
+    $email = $_SESSION['email'];
+    function get_gravatar(
     $email,
     $s = 100,
     $d = 'mp',
     $r = 'g',
     $img = false,
     $atts = array()
-) {
-    $url = 'https://www.gravatar.com/avatar/';
-    $url .= md5(strtolower(trim($email)));
-    $url .= "?s=$s&d=$d&r=$r";
-    if ($img) {
+    ) {
+        $url = 'https://www.gravatar.com/avatar/';
+        $url .= md5(strtolower(trim($email)));
+        $url .= "?s=$s&d=$d&r=$r";
+        if ($img) {
         $url = '<img src="' . $url . '"';
         foreach ($atts as $key => $val) {
-            $url .= ' ' . $key . '="' . $val . '"';
+        $url .= ' ' . $key . '="' . $val . '"';
         }
-        $url .= ' />';
+    $url .= ' />';
     }
     return $url;
+    $src = get_gravatar($email);
+    $_SESSION['src_avatar'] = $src;
+    var_dump($_SESSION['src_avatar']);
+
+
+
+    $sql = 'INSERT INTO users (src_avatar) VALUES (:src_avatar)';
+    $req = $bdd->prepare($sql);
+    $req->bindValue(':src_avatar', $src);
+    $req->execute();
+    }
 }
-$src = get_gravatar($email);
 
 
-
-
-$sql = 'INSERT INTO users (src_avatar) VALUES (:src_avatar)';
-$req = $bdd->prepare($sql);
-$req->bindValue(':src_avatar', $src)
-
-
-
-
-
-// $sql = 'SELECT * FROM topics
-// INNER JOIN messages ON idtopics = messages.topics_idtopics
-// WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
-// GROUP BY idtopics
-// ORDER BY messages.creation_date DESC
-// LIMIT 3';
-// $req = $bdd->prepare($sql);
-// $req->execute();
-
-
-
-// $sql = 'SELECT * FROM topics
-// INNER JOIN messages ON idtopics = messages.topics_idtopics
-// WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 2)
-// GROUP BY idtopics
-// ORDER BY messages.creation_date DESC
-// LIMIT 3';
-// $req = $bdd->prepare($sql);
-// $req->execute();
-// $TopicsFromBoard2 = $req->fetch(PDO::FETCH_ASSOC);
-// var_dump($TopicsFromBoard2);
-
-
-
-// $sql = 'SELECT username FROM users WHERE idusers LIKE :idusers';
-// $req->bindValue(':idusers', $boards1_topics['users_idusers']);
-// $req = $bdd->prepare($sql);
-// $req->execute();
-// $boards1_topics['author'] = $req->fetch(PDO::FETCH_ASSOC);
-// var_dump($board1_topics['author']);
-
-
-
-// $sql = $pdo->query("SELECT * 
-// FROM users 
-// INNER JOIN topics 
-// ON users.id = topics.users_id 
-// WHERE boards_id = 1 
-// ORDER BY created_at DESC
-// LIMIT " . $limit);
-
-// $sql = 'SELECT * FROM topics
-// INNER JOIN messages 
-// ON idtopics = messages.topics_idtopics
-// WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
-// GROUP BY idtopics
-// ORDER BY messages.creation_date DESC
-// LIMIT 3';
-
-
-// $sql = 'SELECT idusers, username
-// FROM users 
-// INNER JOIN topics 
-// ON users.idusers = topics.users_idusers
-// WHERE boards_idboards = 1 
-// ORDER BY created_at DESC
-// LIMIT 3';
-// $req = $bdd->prepare($sql);
-// $req->execute();
-// $topics = $req->fetchAll(PDO::FETCH_ASSOC);
-// var_dump($topics);
-
-
-// $sqlreq = 'SELECT username FROM users WHERE idusers = :idusers'
-//                                 $request = $bdd->prepare($sqlreq);
-//                                 $request->bindValue(':idusers', $board1_topic['users_idusers']);
-//                                 $request->execute();
-//                                 $topic_author = $request->fetch(PDO::FETCH_ASSOC);
-//                                 var_dump($topic_author);
-
-
-//                                 $sqlreq = 'SELECT username FROM users WHERE idusers = :idusers'
-//                                 $request = $bdd->prepare($sqlreq);
-//                                 $request->bindValue(':idusers', $board1_topic['users_idusers']);
-//                                 $request->execute();
-//                                 $topic_author = $request->fetch(PDO::FETCH_ASSOC);
-//                                 var_dump($topic_author);
-
-
-
-
-
-// INNER JOIN users
-// ON idtopics = users.idusers
-// WHERE topics_users.idusers = users.idusers';
 ?>
 
 
@@ -166,7 +83,7 @@ $req->bindValue(':src_avatar', $src)
 <?php if (isset($_SESSION['logged_in'])): ?>
 <?php require "header_on.php"; ?> 
 <?php else: ?>
-<?php require "header_off.php" ?>
+<?php require "header_off.php"; ?>
 <?php endif ?>
 </div>
     <div class="container bg-white rounded">
@@ -190,7 +107,6 @@ $req->bindValue(':src_avatar', $src)
                             $req = $bdd->prepare($sql);
                             $req->execute();
                             $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            var_dump($board1_topics);
                             foreach($board1_topics as $board1_topic) {
                                 $sqlGetAuthor = 'SELECT username FROM users
                                 WHERE idusers = :idusers';
@@ -335,7 +251,7 @@ $req->bindValue(':src_avatar', $src)
 
     </div>
     <div>
-    <?php require "footer.php" ?>
+    <?php require "footer.php"; ?>
     </div>
 </body>
 

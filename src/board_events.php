@@ -3,36 +3,41 @@
 session_start();
 require "config.php";
 
+$errors = array();
+
 // Script pour création de nouveau topic
 if(isset($_POST['new_topic'])) {
-    $topic_title = $_POST['topic_title'];
-    $topic_description = $_POST['topic_description'];
-    $creation_date = date('Y-m-d H:i:s');
-    $board_id = 4;
-    $user_id = $_SESSION['idusers'];
-
-    // Ajout du topic dans la base de données
-    $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
-    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
-    $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
-    $req->bindValue(':boards_idboards', $board_id);
-    $req->bindValue(':users_idusers', $user_id);
-    $req->execute();
-
-    // Récupération de l'id du topic créé
-    $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
-    $req->execute();
-    $topic_id = $req->fetch(PDO::FETCH_ASSOC);
-
-    // Ajout du premier message du topic dans la base de données
-
-    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
-    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
-    $req->bindValue(':users_idusers', $user_id);
-    $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
-    $req->execute();
+    if(!isset($_SESSION['logged_in'])) {
+        array_push($errors, "Vous devez être connecté pour créer un nouveau topic. <a href='login.php'>Se connecter</a> ou <a href='register.php'>S'inscrire</a>");
+    } else {
+        $topic_title = $_POST['topic_title'];
+        $topic_description = $_POST['topic_description'];
+        $creation_date = date('Y-m-d H:i:s');
+        $board_id = 4;
+        $user_id = $_SESSION['idusers'];
+    
+        // Ajout du topic dans la base de données
+        $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
+        $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+        $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
+        $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+        $req->bindValue(':boards_idboards', $board_id);
+        $req->bindValue(':users_idusers', $user_id);
+        $req->execute();
+    
+        // Récupération de l'id du topic créé
+        $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
+        $req->execute();
+        $topic_id = $req->fetch(PDO::FETCH_ASSOC);
+    
+        // Ajout du premier message du topic dans la base de données
+        $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
+        $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+        $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+        $req->bindValue(':users_idusers', $user_id);
+        $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
+        $req->execute();
+    }
 }
 
 ?>
@@ -116,6 +121,7 @@ if(isset($_POST['new_topic'])) {
                 <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id=" refresh">Refresh</button>
             </div>
         </div>
+        <?php include('errors.php'); ?>
         <div class="row black pt-5">
             <div class="container">
                 <div class="row">
@@ -125,7 +131,7 @@ if(isset($_POST['new_topic'])) {
                                     WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 4)
                                     GROUP BY idtopics
                                     ORDER BY messages.creation_date DESC
-                                    LIMIT 9';
+                                    LIMIT 12';
                             $req = $bdd->prepare($sql);
                             $req->execute();
                             $board4_topics = $req->fetchAll(PDO::FETCH_ASSOC);
@@ -144,7 +150,7 @@ if(isset($_POST['new_topic'])) {
                                 echo '<h5 class="card-title text-secondary font-weight-bold">' . $board4_topic['title'] . '</h5>';
                                 echo '<p class="card-text">' . $board4_topic['content'] . '</p>';
                                 echo '<p class="card-text"><small>' . $author['username'] . '-' . $board4_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<a href="topic.php?idtopic=' . $board4_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';

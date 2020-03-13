@@ -33,7 +33,7 @@
                     </div>
                 </div> <!--  End Col -->
 
-                <div class="col-md-2 col-sm-6 pl-5 d-flex justify-content-end">
+                <div class="col-md-2 col-sm-6 pl-5">
                     <img src="https://i.pinimg.com/originals/7f/d6/91/7fd691d130581dc0c10e7f79dbeb9106.png">
                 </div>
             </div>

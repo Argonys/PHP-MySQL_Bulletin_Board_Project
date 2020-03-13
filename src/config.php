@@ -4,11 +4,6 @@ $dbname = 'mydb';
 $user = 'root';
 $password = 'root';
 
-
-
-date_default_timezone_set('Europe/Brussels');
-
-
 // Connexion à la database
 try {
     $bdd = new PDO('mysql:host='.$host.';dbname='.$dbname.';charset=utf8', $user, $password);

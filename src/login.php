@@ -48,17 +48,17 @@ if(isset($_POST['login'])) {
         $req->execute();
 
         // On récupère ce que nous renvoie la requête
-        $userData = $req->fetch(PDO::FETCH_ASSOC);
+        $user_data = $req->fetch(PDO::FETCH_ASSOC);
 
         // On vérifie si l'email rentré correspond à celui de la database
-        if ($userData['email'] === $email) {
+        if ($user_data['email'] === $email) {
 
             // Si oui, on vérifie si les passwords correspondent (sort true ou false)
-            if(password_verify($password, $userData['password'])) {
+            if(password_verify($password, $user_data['password'])) {
 
                 // On save les données de l'user dans la variable $_SESSION
-                $_SESSION = $userData;
-                $_SESSION['logged_in'] = "Vous êtes maintenant connecté.";
+                $_SESSION = $user_data;
+                $_SESSION['logged_in'] = true;
                 header('location: index.php');
             } 
         }

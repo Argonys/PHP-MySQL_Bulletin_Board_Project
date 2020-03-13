@@ -1,11 +1,12 @@
 <?php 
 
 session_start();
+
 // On inclut le fichier de connexion à la database
 require_once "config.php";
 
 
-// date_default_timezone_set('Europe/Brussels');
+date_default_timezone_set('Europe/Brussels');
 
 
 // Si l'user est déjà connecté, on le redirige vers la page d'accueil
@@ -19,14 +20,15 @@ if(isset($_SESSION['logged_in'])) {
 $username = '';
 $email = '';
 $errors = array();
-$signature = '';
 $password_1 = '';
 $password_2 = '';
-$time_creation = date('Y-m-d H:i:s');
+// $time_creation = date('Y-m-d H:i:s');
+// $signature = '';
 
 
 // Si le bouton pour s'inscrire est cliqué, alors
 if (isset($_POST['register'])) {
+
     // ATTENTION, addslashes n'est apparemment pas la meilleure fonction à utiliser ici
 
     // On récupère les données du form
@@ -78,23 +80,30 @@ if (isset($_POST['register'])) {
     if (empty($errors)) {
         // Hachage du password
         $hashed_password = password_hash($password_1, PASSWORD_DEFAULT);
-        $req = $bdd->prepare('INSERT INTO users(username, email, password, time_creation) VALUES(:username, :email, :password, :time_creation)');
-        $req->bindValue(':username', $username, PDO::PARAM_STR);
-        $req->bindValue(':email', $email, PDO::PARAM_STR);
-        $req->bindValue(':password', $hashed_password, PDO::PARAM_STR);
-        $req->bindValue(':time_creation', $time_creation, PDO::PARAM_STR);
+        $sql = 'INSERT INTO users (username, email, password) VALUES (:username, :email, :password)';
+        $req = $bdd->prepare($sql);
+        $req->bindValue(':username', $username);
+        $req->bindValue(':email', $email);
+        $req->bindValue(':password', $hashed_password);
         $req->execute();
         
+        if ($req) {
+            header("location: index.php");
         
-        $_SESSION['logged_in'] = "Bienvenue sur notre forum ! Vous êtes maintenant connecté.";
-        $_SESSION['email'] = $email;
-        $_SESSION['username'] = $username;
-        $_SESSION['password'] = $hashed_password;
-        $_SESSION['time_creation'] = $time_creation;
+            $_SESSION['username'] = $username;
+            $_SESSION['password'] = $hashed_password;
+            $_SESSION['email'] = $email;
+            $_SESSION['logged_in'] = "Bienvenue sur notre forum ! Vous êtes maintenant connecté.";
+        } else {
+            echo "Something went wrong. Please try again later.";
+        }
 
-        // On redirige vers la page d'accueil
-        header('location: index.php'); 
+
+        // // On redirige vers la page d'accueil
+        // header('location: index.php'); 
         
+    } else {
+        echo "ERREUR";
     }
 } 
 ?>

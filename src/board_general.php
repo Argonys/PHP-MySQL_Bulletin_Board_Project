@@ -135,7 +135,6 @@ if(isset($_POST['new_topic'])) {
                             $req = $bdd->prepare($sql);
                             $req->execute();
                             $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            var_dump($board1_topics);
                             foreach($board1_topics as $board1_topic) {
                                 // Requête pour récupérer l'username de l'auteur du topic
                                 $sqlGetAuthor = 'SELECT username FROM users
