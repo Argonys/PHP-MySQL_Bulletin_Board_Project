@@ -1,7 +1,5 @@
 body {
     font-family: "Varela Round", sans-serif;
-    margin-top: auto;
-    background-color: #f1f1f1;
 }
 
 .navbar-header.col {
@@ -77,6 +75,12 @@ body {
     font-size: 19px;
 }
 
+.background {
+    background-image: url("src/images/feather.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 .navbar .nav .btn-primary,
 .navbar .nav .btn-primary:active {
     color: #fff;
@@ -131,6 +135,11 @@ body {
 /* 
 Partie profile */
 
+body {
+    margin-top: auto;
+    background-color: #f1f1f1;
+}
+
 .wordWrap {
     word-wrap: break-word;
     /* IE 5.5-7 */
@@ -139,6 +148,8 @@ Partie profile */
     white-space: pre-wrap;
     /* current browsers */
 }
+
+/* Footer */
 
 ul {
     list-style: none;

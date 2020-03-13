@@ -3,7 +3,7 @@
 session_start();
 require "config.php";
 
-
+// Script pour la date de création du compte en format jour-mois-année
 if (isset($_SESSION['logged_in'])) {
     $sql = 'SELECT * FROM users WHERE email LIKE :email';
     $req = $bdd->prepare($sql);
@@ -14,6 +14,41 @@ if (isset($_SESSION['logged_in'])) {
     // Création de creation_date en format jour-mois-année dans la variable $_SESSION
     $_SESSION['creation_date'] = date('d-m-Y', strtotime($_SESSION["time_creation"]));
 }
+
+
+
+// Script pour avatar et envoi dans la base de données
+$email = $_SESSION['email'];
+function get_gravatar(
+    $email,
+    $s = 100,
+    $d = 'mp',
+    $r = 'g',
+    $img = false,
+    $atts = array()
+) {
+    $url = 'https://www.gravatar.com/avatar/';
+    $url .= md5(strtolower(trim($email)));
+    $url .= "?s=$s&d=$d&r=$r";
+    if ($img) {
+        $url = '<img src="' . $url . '"';
+        foreach ($atts as $key => $val) {
+            $url .= ' ' . $key . '="' . $val . '"';
+        }
+        $url .= ' />';
+    }
+    return $url;
+}
+$src = get_gravatar($email);
+
+
+
+
+$sql = 'INSERT INTO users (src_avatar) VALUES (:src_avatar)';
+$req = $bdd->prepare($sql);
+$req->bindValue(':src_avatar', $src)
+
+
 
 
 
@@ -121,7 +156,6 @@ if (isset($_SESSION['logged_in'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="profile.js"></script>
     <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
 </head>
 <body>
@@ -171,7 +205,7 @@ if (isset($_SESSION['logged_in'])) {
                                 echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
                                 echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
                                 echo '<p class="card-text"><small>' . $author['username'] . '-' . $board1_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<a href="topic.php?idtopic=' . $board1_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
@@ -201,15 +235,15 @@ if (isset($_SESSION['logged_in'])) {
                             LIMIT 3';
                             $req = $bdd->prepare($sql);
                             $req->execute();
-                            $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            foreach($board1_topics as $board1_topic) {
+                            $board2_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                            foreach($board2_topics as $board2_topic) {
                                 echo '<div class="col-md-4 pb-5">';
                                 echo '<div class="card mb bg-light">';
                                 echo '<div class="card-body mb">';
-                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
-                                echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>AUTEUR ICI' . $board1_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board2_topic['title'] . '</h5>';
+                                echo '<p class="card-text">' . $board2_topic['content'] . '</p>';
+                                echo '<p class="card-text"><small>AUTEUR ICI' . $board2_topic['creation_date'] . '</small></p>';
+                                echo '<a href="topic.php?idtopic=' . $board2_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
@@ -239,15 +273,15 @@ if (isset($_SESSION['logged_in'])) {
                             LIMIT 3';
                             $req = $bdd->prepare($sql);
                             $req->execute();
-                            $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            foreach($board1_topics as $board1_topic) {
+                            $board3_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                            foreach($board3_topics as $board3_topic) {
                                 echo '<div class="col-md-4 pb-5">';
                                 echo '<div class="card mb bg-light">';
                                 echo '<div class="card-body mb">';
-                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
-                                echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>AUTEUR ICI' . $board1_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board3_topic['title'] . '</h5>';
+                                echo '<p class="card-text">' . $board3_topic['content'] . '</p>';
+                                echo '<p class="card-text"><small>AUTEUR ICI' . $board3_topic['creation_date'] . '</small></p>';
+                                echo '<a href="topic.php?idtopic=' . $board3_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
@@ -277,16 +311,15 @@ if (isset($_SESSION['logged_in'])) {
                             LIMIT 3';
                             $req = $bdd->prepare($sql); 
                             $req->execute();
-                            $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            var_dump($board1_topics);
-                            foreach($board1_topics as $board1_topic) {
+                            $board4_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                            foreach($board4_topics as $board4_topic) {
                                 echo '<div class="col-md-4 pb-5">';
                                 echo '<div class="card mb bg-light">';
                                 echo '<div class="card-body mb">';
-                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
-                                echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>AUTEUR ICI' . $board1_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
+                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board4_topic['title'] . '</h5>';
+                                echo '<p class="card-text">' . $board4_topic['content'] . '</p>';
+                                echo '<p class="card-text"><small>AUTEUR ICI' . $board4_topic['creation_date'] . '</small></p>';
+                                echo '<a href="topic.php?idtopic=' . $board4_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
