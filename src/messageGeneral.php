@@ -1,11 +1,5 @@
 <?php
-
-session_start();
-require 'config.php';
-
-
-// Avatar
-$email = $_SESSION['email'];
+$email = 'alan.louette@gmail.com';
 function get_gravatar(
     $email,
     $s = 100,
@@ -27,84 +21,6 @@ function get_gravatar(
     return $url;
 }
 $src = get_gravatar($email);
-
-
-
-
-// if(isset($_GET['idtopic'])) {
-$topic_id = htmlspecialchars($_GET['idtopic']);
-
-
-// Script pour envoi d'un nouveau message
-if(isset($_POST['send_message'])) {
-    $message_content = $_POST['new_message'];
-    $message_creation_date = date('Y-m-d H:i:s');
-    $author_id = $_SESSION['idusers'];
-    $topic_id = htmlspecialchars($_GET['idtopic']);
-    // Ajout du topic dans la base de données
-    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
-    $req->bindValue(':content', $message_content, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $message_creation_date, PDO::PARAM_STR);
-    $req->bindValue(':users_idusers', $author_id);
-    $req->bindValue(':topics_idtopics', $topic_id);
-    $req->execute();
-
-
-   // Ajout du premier message du topic dans la base de données
-
-    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
-    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
-    $req->bindValue(':users_idusers', $user_id);
-    $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
-    $req->execute();
-}
-<?php 
-$sql = 'SELECT * FROM topics
-        INNER JOIN messages ON idtopics = messages.topics_idtopics
-        WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
-        GROUP BY idtopics
-        ORDER BY messages.creation_date DESC
-        LIMIT 9';
-$req = $bdd->prepare($sql);
-$req->execute();
-$board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-var_dump($board1_topics);
-foreach($board1_topics as $board1_topic) {
-    // Requête pour récupérer l'username de l'auteur du topic
-    $sqlGetAuthor = 'SELECT username FROM users
-    WHERE idusers = :idusers';
-    $req = $bdd->prepare($sqlGetAuthor);
-    $req->bindValue(':idusers', $board1_topic['users_idusers']);
-    $req->execute();
-    $author = $req->fetch(PDO::FETCH_ASSOC);
-
-$sql = 'SELECT * FROM messages
-INNER JOIN topics ON idtopics = messages.topics_idtopics
-GROUP BY idtopics
-ORDER BY messages.creation_date ASC
-LIMIT 9';
-$req = $bdd->prepare($sql);
-$req->execute();
-$topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
-foreach($topic_messages as $topic_message) {
-// Requête pour récupérer l'username de l'auteur du topic
-    $sqlGetAuthor = 'SELECT username FROM users
-    WHERE idusers = :idusers';
-    $req = $bdd->prepare($sqlGetAuthor);
-    $req->bindValue(':idusers', $topic_message['users_idusers']);
-    $req->execute();
-    $author = $req->fetch(PDO::FETCH_ASSOC);
-}
-
-
-
-
-
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -114,21 +30,20 @@ foreach($topic_messages as $topic_message) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="lib/css/emoji.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela+Round">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="profile.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js" type="text/javascript" ></script>
-    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="profile.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
+    <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>
         #row_style {
             margin-top: 30px;
@@ -140,22 +55,6 @@ foreach($topic_messages as $topic_message) {
         }
     </style>
     <script>
-      $(function() {
-        // Initializes and creates emoji set from sprite sheet
-        window.emojiPicker = new EmojiPicker({
-          emojiable_selector: '[data-emojiable=true]',
-          assetsPath: '../lib/img/',
-          popupButtonClasses: 'fa fa-smile-o'
-        });
-        // Finds all elements with `emojiable_selector` and converts them to rich emoji input fields
-        // You may want to delay this step if you have dynamically created input fields that appear later in the loading process
-        // It can be called as many times as necessary; previously converted input fields will not be converted again
-        window.emojiPicker.discover();
-      });
-    </script>
-    <script>
-
-
         $(document).ready(function() {
             $("#submit").click(function() {
                 $('html, body').animate({
@@ -164,22 +63,54 @@ foreach($topic_messages as $topic_message) {
             });
         });
 
-        // $(function() {
-        //     $("#editor").shieldEditor({
-        //         height: 260
-        //     });
-        // })
+        $(function() {
+            $("#editor").shieldEditor({
+                height: 260
+            });
+        })
     </script>
 </head>
 
 <body>
-    <div>
-    <?php if (isset($_SESSION['logged_in'])): ?>
-    <?php require "header_on.php"; ?> 
-    <?php else: ?>
-    <?php require "header_off.php" ?>
-    <?php endif ?>
-    </div>
+    <nav class="navbar navbar-default navbar-expand-lg navbar-light">
+        <div class="navbar-header d-flex col">
+            <a class="navbar-brand" href="#">Forum<b>Maniac</b></a>
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle navbar-toggler ml-auto">
+                <span class="navbar-toggler-icon"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <!-- Collection of nav links, forms, and other content for toggling -->
+        <div id="navbarCollapse" class="collapse navbar-collapse justify-content-start">
+            <ul class="nav navbar-nav">
+                <li class="nav-item px-3"><a href="#" class="nav-link">Home</a></li>
+                <li class="nav-item px-3"><a href="#" class="nav-link">General</a></li>
+                <li class="nav-item px-3"><a href="#" class="nav-link">Developpement</a></li>
+                <li class="nav-item px-3"><a href="#" class="nav-link">Small talk</a></li>
+                <li class="nav-item px-3"><a href="#" class="nav-link">Events</a></li>
+            </ul>
+            <form class="navbar-form form-inline">
+                <div class="input-group search-box">
+                    <input type="text" id="search" class="form-control" placeholder="Search here...">
+                    <span class="input-group-addon"><i class="material-icons">&#xE8B6;</i></span>
+                </div>
+            </form>
+            <ul class="nav navbar-nav navbar-right ml-auto">
+                <li class="nav-item">
+                    <a data-toggle="dropdown" class="nav-link dropdown active" href="#">Profile <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" class="dropdown-item text-center">Paramètres</a></li>
+                        <li><a href="#" class="dropdown-item text-center">Action 1</a></li>
+                        <li><a href="#" class="dropdown-item text-center">Action 2</a></li>
+                        <li><a href="#" class="dropdown-item text-center">Action 3</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item pt-2"><a href="" class="btn btn-primary mt-1 mb-1">Log out</a></li>
+            </ul>
+        </div>
+    </nav>
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
@@ -208,74 +139,11 @@ foreach($topic_messages as $topic_message) {
         <table class="table border">
             <thead>
                 <tr>
-                    <th class="border-right text-center" style="width: 20%" scope="col">Author</th>
+                    <th class="border-right text-center col-3" scope="col">Author</th>
                     <th class="text-center" scope="col">Message</th>
                 </tr>
             </thead>
             <tbody>
-            <?php $sql = 'SELECT * FROM messages
-                WHERE messages.topics_idtopics = :idtopics
-                ORDER BY DATE(messages.creation_date) DESC
-                            , messages.creation_date ASC
-                LIMIT 20';
-                $req = $bdd->prepare($sql);
-                $req->bindValue(':idtopics', $topic_id);
-                $req->execute();
-                $topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
-                var_dump($topic_messages);
-                foreach($topic_messages as $topic_message) {
-                // Requête pour récupérer l'username de l'auteur du topic
-                    $sqlGetAuthor = 'SELECT username, signature, time_creation FROM users
-                    WHERE idusers = :idusers';
-                    $req = $bdd->prepare($sqlGetAuthor);
-                    $req->bindValue(':idusers', $topic_message['users_idusers']);
-                    $req->execute();
-                    $author = $req->fetch(PDO::FETCH_ASSOC); ?>
-                <tr>
-                    <th class="border-right rounded" scope=" row">
-                        <div class="username pt-2 text-center text-secondary"><?php echo $author['username']; ?></div>
-                        <div class="bloc1-avatar flex-column d-flex  bg-red">
-                            <img class="rounded-circle mt-3 mx-auto " style="width:30%" src=<?php echo $src; ?>>
-                            <div class="userInfo text-center pt-2 text-secondary">
-                                <small class="text-center">
-                                    Registered since <?php echo $author['time_creation']; ?>
-                                </small>
-                            </div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="postEdit row pl-4">
-                            <div class="">
-                                <small class="text-secondary font-italic">Posted : <?php echo $topic_message['creation_date']; ?>
-                                </small>
-                                <?php if (isset($topic_message['edition_date'])) { ?>
-                                <small class="text-secondary font-italic pl-5">
-                                    Edited : 20/02/2020
-                                </small>
-                                <?php } ?>
-                            </div>
-                            <a class="text-right col-7">
-                            <?php if($_SESSION['idusers'] === $topic_message['users_idusers']) { ?>
-                                <a href="#"> <i class="text-right text-primary fa fa-pencil fa-lg"></i></a>
-                                <a href="#"> <i class="pl-5 text-danger fa fa-trash-o fa-lg"></i></a>
-                            <?php } ?>
-                            </a>
-
-                            <div class="text-break pt-3 pb-5 font-weight-normal border-bottom">
-                                <?php echo $topic_message['content']; ?>
-                            </div>
-                            <small class="text-secondary font-italic">
-                                <?php echo $author['signature']; ?>
-                            </small>
-                    </th>
-                </tr>
-                <?php } ?>
-
-
-
-
-
-
                 <tr>
                     <th class="border-right rounded" scope=" row">
                         <div class="username pt-2 text-center text-secondary">Alan LOUETTE</div>
@@ -348,28 +216,63 @@ foreach($topic_messages as $topic_message) {
 
         <div id="test" class="pt-5 bg-light position  d-flex justify-content-center">
             <div class="pl-5 w-50 text-break bg-light">
-                <form action="" class="lead emoji-picker-container" method="POST">
-                    
-                    <textarea data-emojiable="true" name="new_message" class="text-break" placeholder="Write your message here.." id="editor" cols="30" rows="10"></textarea>
-                    <br>
-                    <div class="position pb-5 d-flex justify-content-center">
-                        <button name="send_message" class="btn-primary btn-sm mx-auto mt-2" style="width:30%" type="submit"><a class="text-white font-weight-bold text-decoration-none">Submit</a> </button>
-                    </div>
-                </form>
+                <textarea class="text-break" placeholder="Write your message here.." id="editor" cols="30" rows="10"></textarea>
+                <br>
+
             </div>
         </div>
+        <div class="pl-5 position pb-5 d-flex justify-content-center">
+            <button class="btn-success btn-sm mx-auto mt-2" style="width:10%" type=" button"><a class="text-white font-weight-bold text-decoration-none">Submit</a> </button>
+        </div>
     </div>
-    <div>
-        <?php require "footer.php" ?>
-    </div>
+    <footer class="page-footer font-small pt-">
+        <div class="container-fluid text-center text-md-left">
+            <div class="row">
+                <div class="col-md-6 mt-md-0 mt-3">
+                    <h5 class="text-uppercase">about the forum</h5>
+                    <p>Madrid est la capitale des < span>
+                    </p>
+                </div>
+                <hr class="clearfix w-100 d-md-none pb-3">
+                <div class="col-md-3 mb-md-0 mb-3">
+                    <h5 class="text-uppercase">boards</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="#!">Link 1</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 2</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 3</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 4</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-md-0 mb-3">
+                    <h5 class="text-uppercase">popular topics</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="#!">Link 1</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 2</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 3</a>
+                        </li>
+                        <li>
+                            <a href="#!">Link 4</a>
+                        </li>
+                    </ul>
+                </div>
 
-
-      <!-- ** Don't forget to Add jQuery here ** -->
-  <script src="lib/js/config.js"></script>
-  <script src="lib/js/util.js"></script>
-  <script src="lib/js/jquery.emojiarea.js"></script>
-  <script src="lib/js/emoji-picker.js"></script>
+            </div>
+        </div>
+        <div class="footer-copyright text-left pl-3 py-3">© 2020 Copyright:
+            <a href=""> ForumManiac.com</a>
+        </div>
+    </footer>
 </body>
-
-</html>
-

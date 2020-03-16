@@ -2,7 +2,7 @@
 
 session_start(); 
 
-require_once 'config.php';
+require_once 'config.php'; 
 
 // Si l'user n'est pas connecté, on le redirige vers la page d'accueil
 if($_SESSION['logged_in'] === NULL) {

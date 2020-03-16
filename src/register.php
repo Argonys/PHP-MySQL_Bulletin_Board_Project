@@ -16,6 +16,7 @@ if(isset($_SESSION['logged_in'])) {
 
 
 
+
 $username = '';
 $email = '';
 $errors = array();
@@ -56,6 +57,7 @@ if (isset($_POST['register'])) {
         array_push($errors, "Cette adresse email est déjà utilisée.");
     }
 
+ 
 
     // S'assurer que tous les champs sont remplis/valides
     if (empty($username)) {
@@ -84,7 +86,6 @@ if (isset($_POST['register'])) {
         $req->bindValue(':password', $hashed_password, PDO::PARAM_STR);
         $req->bindValue(':time_creation', $time_creation, PDO::PARAM_STR);
         $req->execute();
-        
         
         $_SESSION['logged_in'] = "Bienvenue sur notre forum ! Vous êtes maintenant connecté.";
         $_SESSION['email'] = $email;
