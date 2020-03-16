@@ -1,35 +1,23 @@
 <?php
 session_start();
 
+// require_once 'Parsedown.php';
+// $parsedown = new Parsedown();
+// echo $parsedown->text(
+// '#Faut lier la BDD ici'
+// );
+
+
 require_once 'config.php';
+require_once 'parsedown.php';
+$parsedown = new Parsedown();
+
 
 // Si l'user n'est pas connecté, on le redirige vers la page d'accueil
 if ($_SESSION['logged_in'] === NULL) {
     header('location: index.php');
     exit;
 }
-
-
-
-// Script pour générer l'avatar
-$email = $_SESSION['email'];
-function get_gravatar($email, $s = 100, $d = 'mp', $r = 'g', $img = false, $atts = array())
-{
-    $url = 'https://www.gravatar.com/avatar/';
-    $url .= md5(strtolower(trim($email)));
-    $url .= "?s=$s&d=$d&r=$r";
-    if ($img) {
-        $url = '<img src="' . $url . '"';
-        foreach ($atts as $key => $val)
-            $url .= ' ' . $key . '="' . $val . '"';
-        $url .= ' />';
-    }
-    return $url;
-}
-$src = get_gravatar($email);
-
-
-
 
 
 $req = $bdd->prepare('SELECT * FROM users WHERE username LIKE :username');
@@ -55,7 +43,7 @@ if (isset($_POST['change_username'])) {
         // On essaie d'exécuter la requête
         $req->execute();
         $_SESSION['username'] = $new_username;
-        header('location: profile1.php');
+        header('location: profile.php');
     }
 }
 
@@ -77,7 +65,7 @@ if (isset($_POST['change_password'])) {
             $req->bindValue(':email', $_SESSION['email']);
             $req->execute();
             $_SESSION['password'] = $new_hashed_password;
-            header('location: profile1.php');
+            header('location: profile.php');
         } else {
             echo "Les deux passwords ne correspondent pas.";
         }
@@ -90,15 +78,13 @@ if (isset($_POST['change_password'])) {
 // Changement de signature
 if (isset($_POST['change_signature'])) {
     $new_signature = $_POST['new_signature'];
-    // On prépare les options de la requête (requête préparée)
     $sql = 'UPDATE users SET signature = :new_signature WHERE email LIKE :email';
     $req = $bdd->prepare($sql);
     $req->bindValue(':new_signature', $new_signature);
     $req->bindValue(':email', $_SESSION['email']);
-    $resp = $req->execute();
-    // On garde en session sa nouvelle signature et on le renvoie sur la page profile.
-    $_SESSION['new_signature'] = $new_signature;
-    header('location: profile1.php');
+    $req->execute();
+    $_SESSION['signature'] = $new_signature;
+    header('location: profile.php');
 }
 
 
@@ -128,8 +114,7 @@ if (isset($_POST['change_signature'])) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="profile.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
-    <link rel="stylesheet" href="css/header_on.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
 </head>
 
 <body style="margin-top: auto;
@@ -197,7 +182,7 @@ if (isset($_POST['change_signature'])) {
                                 </label>
                             </div>
                             <form action="" method="POST">
-                                <textarea placeholder="Write your signature here.." class="form-control" name="new_signature" rows="7" id="signature"><?php echo ($_SESSION['new_signature']); ?></textarea>
+                                <textarea placeholder="Write your signature here.." class="form-control" name="new_signature" rows="7" id="signature"><?php echo $parsedown->text($_SESSION['signature']); ?></textarea>
                                 <button class="btn-success btn-sm mx-auto mt-2" style="width:20%" name="change_signature" type="submit"><a class="text-white text-decoration-none">Submit</a> </button>
                             </form>
                         </div>

@@ -2,37 +2,22 @@
 
 session_start();
 require 'config.php';
+require_once 'parsedown.php';
 
 
-// Avatar
-$email = $_SESSION['email'];
-function get_gravatar(
-    $email,
-    $s = 100,
-    $d = 'mp',
-    $r = 'g',
-    $img = false,
-    $atts = array()
-) {
-    $url = 'https://www.gravatar.com/avatar/';
-    $url .= md5(strtolower(trim($email)));
-    $url .= "?s=$s&d=$d&r=$r";
-    if ($img) {
-        $url = '<img src="' . $url . '"';
-        foreach ($atts as $key => $val) {
-            $url .= ' ' . $key . '="' . $val . '"';
-        }
-        $url .= ' />';
-    }
-    return $url;
+if (isset($_GET['idtopic'])) {
+    $topic_id = htmlspecialchars($_GET['idtopic']);
 }
-$src = get_gravatar($email);
 
 
+// Rechercher le titre du topic actuel
+$sql = 'SELECT title FROM topics WHERE idtopics = :idtopics';
+$req = $bdd->prepare($sql);
+$req->bindValue(':idtopics', $topic_id);
+$req->execute();
+$title = $req->fetch(PDO::FETCH_ASSOC);
 
 
-// if(isset($_GET['idtopic'])) {
-$topic_id = htmlspecialchars($_GET['idtopic']);
 
 $errors = array();
 
@@ -40,11 +25,18 @@ $errors = array();
 if (isset($_POST['send_message'])) {
     if (!isset($_SESSION['logged_in'])) {
         array_push($errors, "Vous devez être connecté pour envoyer un message. <a href='login.php'>Se connecter</a> ou <a href='register.php'>S'inscrire</a>");
-    } else {
-        $message_content = $_POST['new_message'];
-        $message_creation_date = date('Y-m-d H:i:s');
-        $author_id = $_SESSION['idusers'];
-        $topic_id = htmlspecialchars($_GET['idtopic']);
+    }
+
+    $message_content = $_POST['new_message'];
+    $message_creation_date = date('Y-m-d H:i:s');
+    $author_id = $_SESSION['idusers'];
+    $topic_id = htmlspecialchars($_GET['idtopic']);
+
+    if (empty($message_content)) {
+        array_push($errors, "You can't send a message that is empty !");
+    }
+
+    if (empty($errors)) {
         // Ajout du topic dans la base de données
         $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
         $req->bindValue(':content', $message_content, PDO::PARAM_STR);
@@ -76,7 +68,7 @@ if (isset($_POST['send_message'])) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
     <style>
         #row_style {
             margin-top: 30px;
@@ -115,7 +107,7 @@ if (isset($_POST['send_message'])) {
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
-                <h3 class="font-weight-bold">Topic title</h3>
+                <h3 class="font-weight-bold"><?php echo $title['title']; ?></h3>
             </a>
         </div>
         <div>
@@ -134,7 +126,7 @@ if (isset($_POST['send_message'])) {
                 <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id=" refresh">Refresh</button>
             </div>
             <div class="pl-5 pt-4">
-                <button class="btn d-flex flex-direction-left btn-danger" href="" id="board">Back to board</button>
+                <button class="btn d-flex flex-direction-left btn-danger" href="board.php?idboard=<?php echo $id_board; ?>" id="board">Back to board</button>
             </div>
         </div>
         <?php include('errors.php'); ?>
@@ -150,15 +142,14 @@ if (isset($_POST['send_message'])) {
                 WHERE messages.topics_idtopics = :idtopics
                 ORDER BY DATE(messages.creation_date) DESC
                             , messages.creation_date ASC
-                LIMIT 20';
+                LIMIT 15';
                 $req = $bdd->prepare($sql);
                 $req->bindValue(':idtopics', $topic_id);
                 $req->execute();
                 $topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
-                var_dump($topic_messages);
                 foreach ($topic_messages as $topic_message) {
                     // Requête pour récupérer l'username de l'auteur du topic
-                    $sqlGetAuthor = 'SELECT username, signature, time_creation FROM users
+                    $sqlGetAuthor = 'SELECT username, signature, creation_date, src_avatar FROM users
                     WHERE idusers = :idusers';
                     $req = $bdd->prepare($sqlGetAuthor);
                     $req->bindValue(':idusers', $topic_message['users_idusers']);
@@ -168,10 +159,10 @@ if (isset($_POST['send_message'])) {
                         <th class="border-right rounded" scope=" row">
                             <div class="username pt-2 text-center text-secondary"><?php echo $author['username']; ?></div>
                             <div class="bloc1-avatar flex-column d-flex bg-red">
-                                <img class="rounded-circle mt-3 mx-auto " style="width:30%" src=<?php echo $src; ?>>
+                                <img class="rounded-circle mt-3 mx-auto " style="width:30%" src=<?php echo $author['src_avatar']; ?>>
                                 <div class="userInfo text-center pt-2 text-secondary">
                                     <small class="text-center">
-                                        Registered <?php echo $author['time_creation']; ?>
+                                        Registered <?php echo $author['creation_date']; ?>
                                     </small>
                                 </div>
                             </div>
@@ -192,10 +183,17 @@ if (isset($_POST['send_message'])) {
                                 </div>
 
                             </div>
-                            <div class="text-break pt-3 pb-5 font-weight-normal border-bottom"> <?php echo $topic_message['content']; ?>
+                            <div class="text-break pt-3 pb-5 font-weight-normal border-bottom">
+                                <?php
+                                $parsedown = new Parsedown();
+                                echo $parsedown->text($topic_message['content']);
+                                ?>
                             </div>
                             <small class="text-secondary font-italic">
-                                <?php echo $author['signature']; ?>
+                                <?php
+                                $parsedown = new Parsedown();
+                                echo $parsedown->text($author['signature']);
+                                ?>
                             </small>
                         </th>
                     </tr>
