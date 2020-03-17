@@ -6,7 +6,7 @@
                     <div class="single_ftr">
                         <h4 class="sf_title">Contacts</h4>
                         <ul>
-                            <li>Rue de Mulhouse 36, 4020 Liège, <br> Belgium
+                            <li>**Rue** de Mulhouse 36, 4020 Liège, <br> Belgium
                             </li>
                             <li>Contactus@fistos.com</li>
                         </ul>
@@ -33,15 +33,23 @@
                     </div>
                 </div> <!--  End Col -->
 
-                <div class="col-md-2 col-sm-6 pl-5 d-flex justify-content-end">
+                <div class="col-md-2 col-sm-6 pl-5">
                     <img src="https://i.pinimg.com/originals/7f/d6/91/7fd691d130581dc0c10e7f79dbeb9106.png">
                 </div>
             </div>
             <div class="border-top border-white">
-                <div class="col-md-12 col-sm-7 d-flex justify-content-center">
+                <div class="col-md-12 col-sm-7 pb-5 d-flex justify-content-center">
                     <p class="copyright_text text-center">© 2020 All Rights Reserved TeamFistos ® </p>
                 </div>
             </div>
         </div>
     </div>
+
+    <?php
+    require_once 'Parsedown.php';
+    $parsedown = new Parsedown();
+    echo $parsedown->text(
+        '#Faut lier la BDD ici'
+    );
+    ?>
 </footer>

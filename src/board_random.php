@@ -13,7 +13,7 @@ if (isset($_POST['new_topic'])) {
         $topic_title = $_POST['topic_title'];
         $topic_description = $_POST['topic_description'];
         $creation_date = date('Y-m-d H:i:s');
-        $board_id = 1;
+        $board_id = 5;
         $user_id = $_SESSION['idusers'];
 
         // Ajout du topic dans la base de données
@@ -218,6 +218,7 @@ $req = $bdd->prepare($sql);
 $req->execute();
 $b = $req->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 
 <!-- COUNT TOPICS -->
