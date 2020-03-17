@@ -3,9 +3,6 @@
 session_start();
 require "config.php";
 
-
-
-
 // Script pour création de nouveau topic
 if(isset($_POST['new_topic'])) {
     $topic_title = $_POST['topic_title'];

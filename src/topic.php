@@ -79,6 +79,8 @@ foreach($board1_topics as $board1_topic) {
     $req->execute();
     $author = $req->fetch(PDO::FETCH_ASSOC);
 
+
+
 $sql = 'SELECT * FROM messages
 INNER JOIN topics ON idtopics = messages.topics_idtopics
 GROUP BY idtopics
@@ -154,7 +156,6 @@ foreach($topic_messages as $topic_message) {
       });
     </script>
     <script>
-
 
         $(document).ready(function() {
             $("#submit").click(function() {
@@ -363,8 +364,6 @@ foreach($topic_messages as $topic_message) {
         <?php require "footer.php" ?>
     </div>
 
-
-      <!-- ** Don't forget to Add jQuery here ** -->
   <script src="lib/js/config.js"></script>
   <script src="lib/js/util.js"></script>
   <script src="lib/js/jquery.emojiarea.js"></script>

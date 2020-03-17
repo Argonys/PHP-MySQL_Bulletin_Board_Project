@@ -157,6 +157,8 @@ if(isset($_POST['new_topic'])) {
                                 echo '</div>';
                             }
                         ?>
+
+                        //enlever board par board ---> un seul board meilleur
                 </div>
             </div>
         </div>

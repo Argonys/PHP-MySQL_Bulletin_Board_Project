@@ -11,6 +11,9 @@ if(isset($_POST['new_topic'])) {
     $board_id = 4;
     $user_id = $_SESSION['idusers'];
 
+    //get comment over here
+    
+
     // Ajout du topic dans la base de données
     $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
     $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
