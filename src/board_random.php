@@ -61,7 +61,7 @@ if (isset($_POST['new_topic'])) {
     <script type="text/javascript" src="profile.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
     <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>
@@ -188,27 +188,3 @@ if (isset($_POST['new_topic'])) {
     </div>
     <script src="js/scroll.js"></script>
 </body>
-
-
-<!-- SELECT LAST MESSAGE -->
-<?php
-
-$sql = 'SELECT * FROM topics 
-INNER JOIN messages ON idtopics = messages.topics_idtopics 
-WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5) 
-GROUP BY idtopics ORDER BY DATE(messages.creation_date) 
-DESC , messages.creation_date ASC LIMIT 1';
-
-
-$req = $bdd->prepare($sql);
-$req->execute();
-$b = $req->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-
-<!-- COUNT TOPICS -->
-<?php
-$sql = 'SELECT COUNT(*) FROM topics
-INNER JOIN messages ON idtopics = messages.topics_idtopics
-WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5)'
-?>
