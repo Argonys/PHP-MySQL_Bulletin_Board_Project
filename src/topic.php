@@ -10,12 +10,14 @@ if (isset($_GET['idtopic'])) {
 }
 
 
-// Rechercher le titre du topic actuel
-$sql = 'SELECT title FROM topics WHERE idtopics = :idtopics';
+// Rechercher le titre du topic actuel et l'id du board associé
+$sql = 'SELECT title, boards_idboards FROM topics WHERE idtopics = :idtopics';
 $req = $bdd->prepare($sql);
 $req->bindValue(':idtopics', $topic_id);
 $req->execute();
-$title = $req->fetch(PDO::FETCH_ASSOC);
+$board_info = $req->fetch(PDO::FETCH_ASSOC);
+// var_dump($board_info['boards_idboards']);
+
 
 // Récupérer tous les messages du topic correspondant
 $sql = 'SELECT * FROM messages
@@ -27,6 +29,7 @@ $req = $bdd->prepare($sql);
 $req->bindValue(':idtopics', $topic_id);
 $req->execute();
 $topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 
@@ -107,7 +110,7 @@ if (isset($_POST['send_message'])) {
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
-                <h3 class="font-weight-bold"><?php echo $title['title']; ?></h3>
+                <h3 class="font-weight-bold"><?php echo $board_info['title']; ?></h3>
             </a>
         </div>
         <div>
@@ -123,10 +126,10 @@ if (isset($_POST['send_message'])) {
                 <button class="btn d-flex flex-direction-left btn-warning" href="#" id="submit">Post a message</button>
             </div>
             <div class="pl-5 pt-4">
-                <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id=" refresh">Refresh</button>
+                <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id="refresh">Refresh</button>
             </div>
             <div class="pl-5 pt-4">
-                <button class="btn d-flex flex-direction-left btn-danger" href="board.php?idboard=<?php echo $id_board; ?>" id="board">Back to board</button>
+                <a href="board.php?idboard=<?php echo $board_info['boards_idboards']; ?>"><button class="btn d-flex flex-direction-left btn-danger" id="board">Back to board</button></a>
             </div>
         </div>
         <?php include('errors.php'); ?>
