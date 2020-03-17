@@ -55,6 +55,8 @@ if (isset($_POST['send_message'])) {
         $req->bindValue(':users_idusers', $author_id);
         $req->bindValue(':topics_idtopics', $topic_id);
         $req->execute();
+
+        header("location: topic.php?idtopic=$topic_id");
     }
 }
 

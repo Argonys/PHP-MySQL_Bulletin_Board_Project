@@ -73,6 +73,8 @@ if (isset($_POST['new_topic'])) {
         $req->bindValue(':users_idusers', $user_id);
         $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
         $req->execute();
+
+        header("location: board.php?idboard=$board_id");
     }
 }
 ?>
@@ -192,7 +194,7 @@ if (isset($_POST['new_topic'])) {
                     <h4 class="text-center text-secondary font-weight-bold">Create a topic <i class="fa fa-arrow-circle-right"></i></h4>
                     <div class="pl-5">
                         <form method="POST" action="">
-                            <div class="form-group">
+                            <div class=" form-group">
                                 <input type="text" name="topic_title" class="form-control" placeholder="Title">
                             </div>
                             <textarea name="topic_description" id="editor" cols="30" rows="10"></textarea>

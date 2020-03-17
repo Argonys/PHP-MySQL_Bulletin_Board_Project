@@ -66,7 +66,7 @@ require "config.php";
                     $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($board1_topics as $board1_topic) {
                         $sqlGetAuthor = 'SELECT username FROM users
-                                WHERE idusers = :idusers';
+                                        WHERE idusers = :idusers';
                         $req = $bdd->prepare($sqlGetAuthor);
                         $req->bindValue(':idusers', $board1_topic['users_idusers']);
                         $req->execute();
@@ -110,12 +110,19 @@ require "config.php";
                     $req->execute();
                     $board2_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($board2_topics as $board2_topic) {
+                        $sqlGetAuthor = 'SELECT username FROM users
+                                        WHERE idusers = :idusers';
+                        $req = $bdd->prepare($sqlGetAuthor);
+                        $req->bindValue(':idusers', $board2_topic['users_idusers']);
+                        $req->execute();
+                        $author = $req->fetch(PDO::FETCH_ASSOC);
+
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
                         echo '<h5 class="card-title text-secondary font-weight-bold">' . $board2_topic['title'] . '</h5>';
                         echo '<p class="card-text">' . $board2_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>AUTEUR ICI' . $board2_topic['creation_date'] . '</small></p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board2_topic['creation_date'] . '</small></p>';
                         echo '<a href="topic.php?idtopic=' . $board2_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
@@ -148,12 +155,19 @@ require "config.php";
                     $req->execute();
                     $board3_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($board3_topics as $board3_topic) {
+                        $sqlGetAuthor = 'SELECT username FROM users
+                        WHERE idusers = :idusers';
+                        $req = $bdd->prepare($sqlGetAuthor);
+                        $req->bindValue(':idusers', $board3_topic['users_idusers']);
+                        $req->execute();
+                        $author = $req->fetch(PDO::FETCH_ASSOC);
+
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
                         echo '<h5 class="card-title text-secondary font-weight-bold">' . $board3_topic['title'] . '</h5>';
                         echo '<p class="card-text">' . $board3_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>AUTEUR ICI' . $board3_topic['creation_date'] . '</small></p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board3_topic['creation_date'] . '</small></p>';
                         echo '<a href="topic.php?idtopic=' . $board3_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
@@ -186,12 +200,19 @@ require "config.php";
                     $req->execute();
                     $board4_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($board4_topics as $board4_topic) {
+                        $sqlGetAuthor = 'SELECT username FROM users
+                        WHERE idusers = :idusers';
+                        $req = $bdd->prepare($sqlGetAuthor);
+                        $req->bindValue(':idusers', $board4_topic['users_idusers']);
+                        $req->execute();
+                        $author = $req->fetch(PDO::FETCH_ASSOC);
+
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
                         echo '<h5 class="card-title text-secondary font-weight-bold">' . $board4_topic['title'] . '</h5>';
                         echo '<p class="card-text">' . $board4_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>AUTEUR ICI' . $board4_topic['creation_date'] . '</small></p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board4_topic['creation_date'] . '</small></p>';
                         echo '<a href="topic.php?idtopic=' . $board4_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
@@ -224,12 +245,19 @@ require "config.php";
                     $req->execute();
                     $board5_topics = $req->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($board5_topics as $board5_topic) {
+                        $sqlGetAuthor = 'SELECT username FROM users
+                        WHERE idusers = :idusers';
+                        $req = $bdd->prepare($sqlGetAuthor);
+                        $req->bindValue(':idusers', $board5_topic['users_idusers']);
+                        $req->execute();
+                        $author = $req->fetch(PDO::FETCH_ASSOC);
+
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
                         echo '<h5 class="card-title text-secondary font-weight-bold">' . $board5_topic['title'] . '</h5>';
                         echo '<p class="card-text">' . $board5_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>AUTEUR ICI' . $board5_topic['creation_date'] . '</small></p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board5_topic['creation_date'] . '</small></p>';
                         echo '<a href="topic.php?idtopic=' . $board5_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
