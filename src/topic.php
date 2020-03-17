@@ -17,6 +17,17 @@ $req->bindValue(':idtopics', $topic_id);
 $req->execute();
 $title = $req->fetch(PDO::FETCH_ASSOC);
 
+// Récupérer tous les messages du topic correspondant
+$sql = 'SELECT * FROM messages
+        WHERE messages.topics_idtopics = :idtopics
+        ORDER BY DATE(messages.creation_date) DESC
+                    , messages.creation_date ASC
+        LIMIT 15';
+$req = $bdd->prepare($sql);
+$req->bindValue(':idtopics', $topic_id);
+$req->execute();
+$topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 $errors = array();
@@ -69,6 +80,8 @@ if (isset($_POST['send_message'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
+    <!-- Emoji-picker -->
+    <link href="lib/css/emoji.css" rel="stylesheet">
     <style>
         #row_style {
             margin-top: 30px;
@@ -79,21 +92,6 @@ if (isset($_POST['send_message'])) {
             margin: auto;
         }
     </style>
-    <script>
-        $(document).ready(function() {
-            $("#submit").click(function() {
-                $('html, body').animate({
-                    scrollTop: $("#test").offset().top
-                }, 500);
-            });
-        });
-
-        $(function() {
-            $("#editor").shieldEditor({
-                height: 260
-            });
-        })
-    </script>
 </head>
 
 <body>
@@ -138,15 +136,7 @@ if (isset($_POST['send_message'])) {
                 </tr>
             </thead>
             <tbody>
-                <?php $sql = 'SELECT * FROM messages
-                WHERE messages.topics_idtopics = :idtopics
-                ORDER BY DATE(messages.creation_date) DESC
-                            , messages.creation_date ASC
-                LIMIT 15';
-                $req = $bdd->prepare($sql);
-                $req->bindValue(':idtopics', $topic_id);
-                $req->execute();
-                $topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
+                <?php
                 foreach ($topic_messages as $topic_message) {
                     // Requête pour récupérer l'username de l'auteur du topic
                     $sqlGetAuthor = 'SELECT username, signature, creation_date, src_avatar FROM users
@@ -203,8 +193,9 @@ if (isset($_POST['send_message'])) {
 
         <div id="test" class="pt-5 bg-light position  d-flex justify-content-center">
             <div class="pl-5 w-50 text-break bg-light">
-                <form action="" method="POST">
-                    <textarea name="new_message" class="text-break" placeholder="Write your message here.." id="editor" cols="30" rows="10"></textarea>
+                <form action="" method="POST" class="emoji-picker-container">
+                    <textarea data-emojiable="true" name="new_message" class="text-break" placeholder="Write your message here.." cols="30" rows="10"></textarea>
+                    <!-- J'ai delete le id="editor" du textarea pour éviter les conflits avec emoji-picker -->
                     <br>
                     <div class=" position pb-5 d-flex justify-content-center">
                         <button name="send_message" class="btn-primary btn-sm mx-auto mt-2" style="width:30%" type="submit"><a class="text-white font-weight-bold text-decoration-none">Submit</a> </button>
@@ -216,4 +207,28 @@ if (isset($_POST['send_message'])) {
     <div>
         <?php require "footer.php" ?>
     </div>
+
+    <!-- Begin emoji-picker JavaScript -->
+    <script src="lib/js/config.js"></script>
+    <script src="lib/js/util.js"></script>
+    <script src="lib/js/jquery.emojiarea.js"></script>
+    <script src="lib/js/emoji-picker.js"></script>
+    <!-- End emoji-picker JavaScript -->
+
+    <script>
+        $(function() {
+            // Initializes and creates emoji set from sprite sheet
+            window.emojiPicker = new EmojiPicker({
+                emojiable_selector: '[data-emojiable=true]',
+                assetsPath: 'lib/img/',
+                popupButtonClasses: 'fa fa-smile-o'
+            });
+            // Finds all elements with `emojiable_selector` and converts them to rich emoji input fields
+            // You may want to delay this step if you have dynamically created input fields that appear later in the loading process
+            // It can be called as many times as necessary; previously converted input fields will not be converted again
+            window.emojiPicker.discover();
+        });
+    </script>
+
+    <script src="js/scroll.js"></script>
 </body>

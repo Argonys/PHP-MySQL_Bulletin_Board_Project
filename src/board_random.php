@@ -3,55 +3,19 @@
 session_start();
 require "config.php";
 
-
-
-if (isset($_GET['idboard'])) {
-    $board_id = $_GET['idboard'];
-}
-
-// Récupérer le titre du board actuel
-$sql = 'SELECT title FROM boards WHERE idboards = :idboards';
-$req = $bdd->prepare($sql);
-$req->bindValue(':idboards', $board_id);
-$req->execute();
-$board_name = $req->fetch(PDO::FETCH_ASSOC);
-
-// Récupérer la liste des 12 derniers topics du board actuel
-$sql = 'SELECT * FROM topics
-INNER JOIN messages ON idtopics = messages.topics_idtopics
-WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = :idboards)
-GROUP BY idtopics
-ORDER BY messages.creation_date DESC
-LIMIT 12';
-$req = $bdd->prepare($sql);
-$req->bindValue(':idboards', $board_id);
-$req->execute();
-$board_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-
-
-
 $errors = array();
 
 // Script pour création de nouveau topic
 if (isset($_POST['new_topic'])) {
     if (!isset($_SESSION['logged_in'])) {
         array_push($errors, "Vous devez être connecté pour créer un nouveau topic. <a href='login.php'>Se connecter</a> ou <a href='register.php'>S'inscrire</a>");
-    }
+    } else {
+        $topic_title = $_POST['topic_title'];
+        $topic_description = $_POST['topic_description'];
+        $creation_date = date('Y-m-d H:i:s');
+        $board_id = 5;
+        $user_id = $_SESSION['idusers'];
 
-    $topic_title = $_POST['topic_title'];
-    $topic_description = $_POST['topic_description'];
-    $creation_date = date('Y-m-d H:i:s');
-    $user_id = $_SESSION['idusers'];
-
-    if (empty($topic_title)) {
-        array_push($errors, "You can't create a topic with an empty title.");
-    }
-
-    if (empty($topic_description)) {
-        array_push($errors, "You can't create a topic without a description.");
-    }
-
-    if (empty($errors)) {
         // Ajout du topic dans la base de données
         $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
         $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
@@ -97,7 +61,7 @@ if (isset($_POST['new_topic'])) {
     <script type="text/javascript" src="profile.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
     <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>
@@ -123,7 +87,7 @@ if (isset($_POST['new_topic'])) {
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
-                <h3 class="font-weight-bold">Topics list : <?php echo $board_name['title'] ?></h3>
+                <h3 class="font-weight-bold">Topics list : RANDOM</h3>
             </a>
         </div>
         <div>
@@ -147,22 +111,31 @@ if (isset($_POST['new_topic'])) {
             <div class="container">
                 <div class="row">
                     <?php
-                    var_dump($board_topics);
-                    foreach ($board_topics as $board_topic) {
+                    $sql = 'SELECT * FROM topics
+                                    INNER JOIN messages ON idtopics = messages.topics_idtopics
+                                    WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5)
+                                    GROUP BY idtopics
+                                    ORDER BY messages.creation_date DESC
+                                    LIMIT 5';
+                    $req = $bdd->prepare($sql);
+                    $req->execute();
+                    $board5_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($board5_topics as $board5_topic) {
                         // Requête pour récupérer l'username de l'auteur du topic
                         $sqlGetAuthor = 'SELECT username FROM users
                                 WHERE idusers = :idusers';
                         $req = $bdd->prepare($sqlGetAuthor);
-                        $req->bindValue(':idusers', $board_topic['users_idusers']);
+                        $req->bindValue(':idusers', $board5_topic['users_idusers']);
                         $req->execute();
                         $author = $req->fetch(PDO::FETCH_ASSOC);
+
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
-                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board_topic['title'] . '</h5>';
-                        echo '<p class="card-text">' . $board_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board_topic['creation_date'] . '</small></p>';
-                        echo '<a href="topic.php?idtopic=' . $board_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
+                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board5_topic['title'] . '</h5>';
+                        echo '<p class="card-text">' . $board5_topic['content'] . '</p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board5_topic['creation_date'] . '</small></p>';
+                        echo '<a href="topic.php?idtopic=' . $board5_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
                         echo '</div>';
@@ -215,3 +188,27 @@ if (isset($_POST['new_topic'])) {
     </div>
     <script src="js/scroll.js"></script>
 </body>
+
+
+<!-- SELECT LAST MESSAGE -->
+<?php
+
+$sql = 'SELECT * FROM topics 
+INNER JOIN messages ON idtopics = messages.topics_idtopics 
+WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5) 
+GROUP BY idtopics ORDER BY DATE(messages.creation_date) 
+DESC , messages.creation_date ASC LIMIT 1';
+
+
+$req = $bdd->prepare($sql);
+$req->execute();
+$b = $req->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+
+<!-- COUNT TOPICS -->
+<?php
+$sql = 'SELECT COUNT(*) FROM topics
+INNER JOIN messages ON idtopics = messages.topics_idtopics
+WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5)'
+?>

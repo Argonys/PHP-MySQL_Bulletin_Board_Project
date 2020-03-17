@@ -205,6 +205,44 @@ require "config.php";
                 </div>
             </div>
         </div>
+        <div class="bg-primary rounded text-center py-1 mt-3">
+            <a class="text-white text-decoration-none" href="board_random.php">
+                <h3 class="font-weight-bold">RANDOM</h3>
+            </a>
+        </div>
+        <div class="row black pt-5 ">
+            <div class="container">
+                <div class="row">
+                    <?php
+                    $sql = 'SELECT * FROM topics
+                            INNER JOIN messages ON idtopics = messages.topics_idtopics
+                            WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 5)
+                            GROUP BY idtopics
+                            ORDER BY messages.creation_date DESC
+                            LIMIT 3';
+                    $req = $bdd->prepare($sql);
+                    $req->execute();
+                    $board5_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($board5_topics as $board5_topic) {
+                        echo '<div class="col-md-4 pb-5">';
+                        echo '<div class="card mb bg-light">';
+                        echo '<div class="card-body mb">';
+                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board5_topic['title'] . '</h5>';
+                        echo '<p class="card-text">' . $board5_topic['content'] . '</p>';
+                        echo '<p class="card-text"><small>AUTEUR ICI' . $board5_topic['creation_date'] . '</small></p>';
+                        echo '<a href="topic.php?idtopic=' . $board5_topic["idtopics"] . '"<button type="button" class="btn btn-primary mb">Read more</button></a>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                    ?>
+
+                </div>
+                <div classe="rdMore text-center">
+                    <div class="nav-item text-center pb-5 pt-2"><a href="board_random.php" class="btn btn-secondary text-white text-center mt-1 mb-1">More topics...</a></div>
+                </div>
+            </div>
+        </div>
 
     </div>
     <div>

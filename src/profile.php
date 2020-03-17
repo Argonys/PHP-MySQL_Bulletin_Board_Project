@@ -126,7 +126,7 @@ if (isset($_POST['change_signature'])) {
     <div class="container bg-white rounded">
         <div class="bloc1 row">
             <div class="bloc1-avatar border-right rounded flex-column col-sm-3 d-flex  bg-red">
-                <img class="rounded-circle mt-5 mx-auto " style="width:60%" src=<?php echo $src; ?>>
+                <img class="rounded-circle mt-5 mx-auto " style="width:60%" src=<?php echo $_SESSION['src_avatar']; ?>>
                 <button class="btn-info btn mx-auto mt-5" href="https://fr.gravatar.com/emails/" style="width:60%" type=" button"><a class="text-white text-decoration-none" href="https://fr.gravatar.com/emails/">Edit avatar</a> </button>
                 <div class="userInfo pl-5 pt-5 text-secondary">
                     Registered since <?php echo $_SESSION['creation_date']; ?><br />
