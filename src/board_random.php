@@ -74,6 +74,7 @@ if (isset($_POST['new_topic'])) {
             margin: auto;
         }
     </style>
+<<<<<<< HEAD
     <script>
         $(document).ready(function() {
             $("#submit").click(function() {
@@ -89,6 +90,8 @@ if (isset($_POST['new_topic'])) {
             });
         })
     </script>
+=======
+>>>>>>> 2a89747fe78449fbdeaa3797283aada6d01f2970
 </head>
 
 <body>
@@ -201,6 +204,10 @@ if (isset($_POST['new_topic'])) {
     <div>
         <?php require "footer.php" ?>
     </div>
+<<<<<<< HEAD
+=======
+    <script src="js/scroll.js"></script>
+>>>>>>> 2a89747fe78449fbdeaa3797283aada6d01f2970
 </body>
 
 
@@ -220,7 +227,10 @@ $b = $req->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2a89747fe78449fbdeaa3797283aada6d01f2970
 <!-- COUNT TOPICS -->
 <?php
 $sql = 'SELECT COUNT(*) FROM topics

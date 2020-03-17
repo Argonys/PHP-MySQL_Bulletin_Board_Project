@@ -3,41 +3,45 @@
 session_start();
 require "config.php";
 
-
-
+$errors = array();
 
 // Script pour création de nouveau topic
-if(isset($_POST['new_topic'])) {
-    $topic_title = $_POST['topic_title'];
-    $topic_description = $_POST['topic_description'];
-    $creation_date = date('Y-m-d H:i:s');
-    $board_id = 2;
-    $user_id = $_SESSION['idusers'];
+if (isset($_POST['new_topic'])) {
+    if (!isset($_SESSION['logged_in'])) {
+        array_push($errors, "Vous devez être connecté pour créer un nouveau topic. <a href='login.php'>Se connecter</a> ou <a href='register.php'>S'inscrire</a>");
+    } else {
+        $topic_title = $_POST['topic_title'];
+        $topic_description = $_POST['topic_description'];
+        $creation_date = date('Y-m-d H:i:s');
+        $board_id = 2;
+        $user_id = $_SESSION['idusers'];
 
-    // Ajout du topic dans la base de données
-    $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
-    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
-    $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
-    $req->bindValue(':boards_idboards', $board_id);
-    $req->bindValue(':users_idusers', $user_id);
-    $req->execute();
+        // Ajout du topic dans la base de données
+        $req = $bdd->prepare('INSERT INTO topics (content, title, creation_date, boards_idboards, users_idusers) VALUES(:content, :title, :creation_date, :boards_idboards, :users_idusers)');
+        $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+        $req->bindValue(':title', $topic_title, PDO::PARAM_STR);
+        $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+        $req->bindValue(':boards_idboards', $board_id);
+        $req->bindValue(':users_idusers', $user_id);
+        $req->execute();
 
-    // Récupération de l'id du topic créé
-    $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
-    $req->execute();
-    $topic_id = $req->fetch(PDO::FETCH_ASSOC);
+        // Récupération de l'id du topic créé
+        $req = $bdd->prepare('SELECT idtopics FROM topics WHERE idtopics = LAST_INSERT_ID()');
+        $req->execute();
+        $topic_id = $req->fetch(PDO::FETCH_ASSOC);
 
-    // Ajout du premier message du topic dans la base de données
-
-    $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
-    $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
-    $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
-    $req->bindValue(':users_idusers', $user_id);
-    $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
-    $req->execute();
+        // Ajout du premier message du topic dans la base de données
+        $req = $bdd->prepare('INSERT INTO messages (content, creation_date, users_idusers, topics_idtopics) VALUES(:content, :creation_date, :users_idusers, :topics_idtopics)');
+        $req->bindValue(':content', $topic_description, PDO::PARAM_STR);
+        $req->bindValue(':creation_date', $creation_date, PDO::PARAM_STR);
+        $req->bindValue(':users_idusers', $user_id);
+        $req->bindValue(':topics_idtopics', $topic_id["idtopics"]);
+        $req->execute();
+    }
 }
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -58,7 +62,7 @@ if(isset($_POST['new_topic'])) {
     <script type="text/javascript" src="profile.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/profile1.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" />
     <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <style>
@@ -89,13 +93,13 @@ if(isset($_POST['new_topic'])) {
 </head>
 
 <body>
-<div>
-                <?php if (isset($_SESSION['logged_in'])): ?>
-                    <?php require "header_on.php"; ?> 
-                <?php else: ?>
-                    <?php require "header_off.php" ?>
-                <?php endif ?>
-</div>
+    <div>
+        <?php if (isset($_SESSION['logged_in'])) : ?>
+            <?php require "header_on.php"; ?>
+        <?php else : ?>
+            <?php require "header_off.php" ?>
+        <?php endif ?>
+    </div>
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
@@ -115,43 +119,44 @@ if(isset($_POST['new_topic'])) {
                 <button class="btn d-flex flex-direction-left btn-warning" href="#" id="submit">Create a topic</button>
             </div>
             <div class="pl-5 pt-4">
-                <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id=" refresh">Refresh</button>
+                <button class="btn btn-success d-flex flex-direction-left" href="#" value="Reload Page" onClick="window.location.reload()" id="refresh">Refresh</button>
             </div>
         </div>
+        <?php include('errors.php'); ?>
         <div class="row black pt-5">
             <div class="container">
                 <div class="row">
-                        <?php 
-                            $sql = 'SELECT * FROM topics
+                    <?php
+                    $sql = 'SELECT * FROM topics
                                     INNER JOIN messages ON idtopics = messages.topics_idtopics
                                     WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 2)
                                     GROUP BY idtopics
                                     ORDER BY messages.creation_date DESC
-                                    LIMIT 9';
-                            $req = $bdd->prepare($sql);
-                            $req->execute();
-                            $board2_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                            foreach($board2_topics as $board2_topic) {
-                                // Requête pour récupérer l'username de l'auteur du topic
-                                $sqlGetAuthor = 'SELECT username FROM users
+                                    LIMIT 12';
+                    $req = $bdd->prepare($sql);
+                    $req->execute();
+                    $board2_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($board2_topics as $board2_topic) {
+                        // Requête pour récupérer l'username de l'auteur du topic
+                        $sqlGetAuthor = 'SELECT username FROM users
                                 WHERE idusers = :idusers';
-                                $req = $bdd->prepare($sqlGetAuthor);
-                                $req->bindValue(':idusers', $board2_topic['users_idusers']);
-                                $req->execute();
-                                $author = $req->fetch(PDO::FETCH_ASSOC);
+                        $req = $bdd->prepare($sqlGetAuthor);
+                        $req->bindValue(':idusers', $board2_topic['users_idusers']);
+                        $req->execute();
+                        $author = $req->fetch(PDO::FETCH_ASSOC);
 
-                                echo '<div class="col-md-4 pb-5">';
-                                echo '<div class="card mb bg-light">';
-                                echo '<div class="card-body mb">';
-                                echo '<h5 class="card-title text-secondary font-weight-bold">' . $board2_topic['title'] . '</h5>';
-                                echo '<p class="card-text">' . $board2_topic['content'] . '</p>';
-                                echo '<p class="card-text"><small>' . $author['username'] . '-' . $board2_topic['creation_date'] . '</small></p>';
-                                echo '<button type="button" class="btn btn-primary mb">Read more</button>';
-                                echo '</div>';
-                                echo '</div>';
-                                echo '</div>';
-                            }
-                        ?>
+                        echo '<div class="col-md-4 pb-5">';
+                        echo '<div class="card mb bg-light">';
+                        echo '<div class="card-body mb">';
+                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board2_topic['title'] . '</h5>';
+                        echo '<p class="card-text">' . $board2_topic['content'] . '</p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board2_topic['creation_date'] . '</small></p>';
+                        echo '<a href="topic.php?idtopic=' . $board2_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -194,6 +199,6 @@ if(isset($_POST['new_topic'])) {
     </div>
     </div>
     <div>
-    <?php require "footer.php" ?>
+        <?php require "footer.php" ?>
     </div>
 </body>

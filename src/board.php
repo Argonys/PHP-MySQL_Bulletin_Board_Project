@@ -5,6 +5,31 @@ require "config.php";
 
 
 
+if (isset($_GET['idboard'])) {
+    $board_id = $_GET['idboard'];
+}
+
+// Récupérer le titre du board actuel
+$sql = 'SELECT title FROM boards WHERE idboards = :idboards';
+$req = $bdd->prepare($sql);
+$req->bindValue(':idboards', $board_id);
+$req->execute();
+$board_name = $req->fetch(PDO::FETCH_ASSOC);
+
+// Récupérer la liste des 12 derniers topics du board actuel
+$sql = 'SELECT * FROM topics
+INNER JOIN messages ON idtopics = messages.topics_idtopics
+WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = :idboards)
+GROUP BY idtopics
+ORDER BY messages.creation_date DESC
+LIMIT 12';
+$req = $bdd->prepare($sql);
+$req->bindValue(':idboards', $board_id);
+$req->execute();
+$board_topics = $req->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 $errors = array();
 
 // Script pour création de nouveau topic
@@ -16,7 +41,6 @@ if (isset($_POST['new_topic'])) {
     $topic_title = $_POST['topic_title'];
     $topic_description = $_POST['topic_description'];
     $creation_date = date('Y-m-d H:i:s');
-    $board_id = 1;
     $user_id = $_SESSION['idusers'];
 
     if (empty($topic_title)) {
@@ -86,21 +110,6 @@ if (isset($_POST['new_topic'])) {
             margin: auto;
         }
     </style>
-    <script>
-        $(document).ready(function() {
-            $("#submit").click(function() {
-                $('html, body').animate({
-                    scrollTop: $("#test").offset().top
-                }, 1000);
-            });
-        });
-
-        $(function() {
-            $("#editor").shieldEditor({
-                height: 260
-            });
-        })
-    </script>
 </head>
 
 <body>
@@ -114,7 +123,7 @@ if (isset($_POST['new_topic'])) {
     <div class="container bg-white rounded">
         <div class="bg-primary rounded text-center py-1 mt-3">
             <a class="text-white text-decoration-none" href="">
-                <h3 class="font-weight-bold">Topics list : GENERAL</h3>
+                <h3 class="font-weight-bold">Topics list : <?php echo $board_name['title'] ?></h3>
             </a>
         </div>
         <div>
@@ -138,31 +147,22 @@ if (isset($_POST['new_topic'])) {
             <div class="container">
                 <div class="row">
                     <?php
-                    $sql = 'SELECT * FROM topics
-                                    INNER JOIN messages ON idtopics = messages.topics_idtopics
-                                    WHERE topics.boards_idboards = (SELECT idboards FROM boards WHERE idboards = 1)
-                                    GROUP BY idtopics
-                                    ORDER BY messages.creation_date DESC
-                                    LIMIT 12';
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-                    $board1_topics = $req->fetchAll(PDO::FETCH_ASSOC);
-                    foreach ($board1_topics as $board1_topic) {
+                    var_dump($board_topics);
+                    foreach ($board_topics as $board_topic) {
                         // Requête pour récupérer l'username de l'auteur du topic
                         $sqlGetAuthor = 'SELECT username FROM users
                                 WHERE idusers = :idusers';
                         $req = $bdd->prepare($sqlGetAuthor);
-                        $req->bindValue(':idusers', $board1_topic['users_idusers']);
+                        $req->bindValue(':idusers', $board_topic['users_idusers']);
                         $req->execute();
                         $author = $req->fetch(PDO::FETCH_ASSOC);
-
                         echo '<div class="col-md-4 pb-5">';
                         echo '<div class="card mb bg-light">';
                         echo '<div class="card-body mb">';
-                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board1_topic['title'] . '</h5>';
-                        echo '<p class="card-text">' . $board1_topic['content'] . '</p>';
-                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board1_topic['creation_date'] . '</small></p>';
-                        echo '<a href="topic.php?idtopic=' . $board1_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
+                        echo '<h5 class="card-title text-secondary font-weight-bold">' . $board_topic['title'] . '</h5>';
+                        echo '<p class="card-text">' . $board_topic['content'] . '</p>';
+                        echo '<p class="card-text"><small>' . $author['username'] . '-' . $board_topic['creation_date'] . '</small></p>';
+                        echo '<a href="topic.php?idtopic=' . $board_topic["idtopics"] . '"><button type="button" class="btn btn-primary mb">Read more</button></a>';
                         echo '</div>';
                         echo '</div>';
                         echo '</div>';
@@ -213,4 +213,5 @@ if (isset($_POST['new_topic'])) {
     <div>
         <?php require "footer.php" ?>
     </div>
+    <script src="js/scroll.js"></script>
 </body>

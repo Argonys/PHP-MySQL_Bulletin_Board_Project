@@ -17,10 +17,10 @@
                     <div class="single_ftr">
                         <h4 class="sf_title">Boards</h4>
                         <ul>
-                            <li><a href="board_general.php">GENERAL</a></li>
-                            <li><a href="board_development.php">DEVELOPMENT</a></li>
-                            <li><a href="board_talks.php">SMALL TALKS</a></li>
-                            <li><a href="board_events.php">EVENTS</a></li>
+                            <li><a href="board.php?idboard=1">GENERAL</a></li>
+                            <li><a href="board.php?idboard=2">DEVELOPMENT</a></li>
+                            <li><a href="board.php?idboard=3">SMALL TALKS</a></li>
+                            <li><a href="board.php?idboard=4">EVENTS</a></li>
                         </ul>
                     </div>
                 </div> <!--  End Col -->
@@ -44,6 +44,7 @@
             </div>
         </div>
     </div>
+<<<<<<< HEAD
 
     <?php
     require_once 'Parsedown.php';
@@ -52,4 +53,6 @@
         '#Faut lier la BDD ici'
     );
     ?>
+=======
+>>>>>>> 2a89747fe78449fbdeaa3797283aada6d01f2970
 </footer>
