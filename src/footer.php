@@ -6,7 +6,7 @@
                     <div class="single_ftr">
                         <h4 class="sf_title">Contacts</h4>
                         <ul>
-                            <li>**Rue** de Mulhouse 36, 4020 Liège, <br> Belgium
+                            <li>Rue de Mulhouse 36, 4020 Liège, <br> Belgium
                             </li>
                             <li>Contactus@fistos.com</li>
                         </ul>
@@ -44,15 +44,10 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
 
-    <?php
-    require_once 'Parsedown.php';
-    $parsedown = new Parsedown();
-    echo $parsedown->text(
-        '#Faut lier la BDD ici'
-    );
-    ?>
-=======
->>>>>>> 2a89747fe78449fbdeaa3797283aada6d01f2970
+    <!-- // <?php
+            // require_once 'Parsedown.php';
+            // $parsedown = new Parsedown();
+            // echo $parsedown->text();
+            ?> // -->
 </footer>
