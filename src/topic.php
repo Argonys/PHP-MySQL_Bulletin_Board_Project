@@ -16,13 +16,13 @@ $req = $bdd->prepare($sql);
 $req->bindValue(':idtopics', $topic_id);
 $req->execute();
 $board_info = $req->fetch(PDO::FETCH_ASSOC);
-// var_dump($board_info['boards_idboards']);
+
 
 
 // Récupérer tous les messages du topic correspondant
 $sql = 'SELECT * FROM messages
         WHERE messages.topics_idtopics = :idtopics
-        ORDER BY DATE(messages.creation_date) DESC
+        ORDER BY DATE(messages.creation_date) ASC
                     , messages.creation_date ASC
         LIMIT 15';
 $req = $bdd->prepare($sql);
@@ -31,11 +31,23 @@ $req->execute();
 $topic_messages = $req->fetchAll(PDO::FETCH_ASSOC);
 
 
+// Récupérer le dernier message du topic actuel
+$sql = 'SELECT * FROM messages
+        WHERE messages.topics_idtopics = :idtopics
+        ORDER BY DATE(messages.creation_date) DESC
+                    , messages.creation_date DESC
+        LIMIT 1';
+$req = $bdd->prepare($sql);
+$req->bindValue(':idtopics', $topic_id);
+$req->execute();
+$last_message = $req->fetch(PDO::FETCH_ASSOC);
 
 
-$errors = array();
+
 
 // Script pour envoi d'un nouveau message
+$errors = array();
+
 if (isset($_POST['send_message'])) {
     if (!isset($_SESSION['logged_in'])) {
         array_push($errors, "Vous devez être connecté pour envoyer un message. <a href='login.php'>Se connecter</a> ou <a href='register.php'>S'inscrire</a>");
@@ -62,6 +74,42 @@ if (isset($_POST['send_message'])) {
         header("location: topic.php?idtopic=$topic_id");
     }
 }
+
+
+
+// Script de delete d'un message
+if (isset($_POST['delete_message'])) {
+    $id_message = $_POST['delete_message'];
+
+    $sql = 'UPDATE messages SET deleted = :true WHERE idmessages = :idmessages';
+    $req = $bdd->prepare($sql);
+    $req->bindValue(":idmessages", $id_message);
+    $req->bindValue(":true", true);
+    $req->execute();
+
+    header("location: topic.php?idtopic=$topic_id");
+}
+
+
+
+
+// Script pour envoi du message édité
+if (isset($_POST['send_message_edited'])) {
+    $new_content = $_POST['new_content'];
+    $edition_date = date('Y-m-d H:i:s');
+    $id_message = $_POST['send_message_edited'];
+
+    $sql = 'UPDATE messages SET content = :content, edition_date = :edition_date WHERE idmessages = :idmessages';
+    $req = $bdd->prepare($sql);
+    $req->bindValue(':content', $new_content);
+    $req->bindValue(':edition_date', $edition_date);
+    $req->bindValue(':idmessages', $id_message);
+    $req->execute();
+
+    header("location: topic.php?idtopic=$topic_id");
+}
+
+
 
 ?>
 
@@ -149,7 +197,8 @@ if (isset($_POST['send_message'])) {
                     $req = $bdd->prepare($sqlGetAuthor);
                     $req->bindValue(':idusers', $topic_message['users_idusers']);
                     $req->execute();
-                    $author = $req->fetch(PDO::FETCH_ASSOC); ?>
+                    $author = $req->fetch(PDO::FETCH_ASSOC);
+                ?>
                     <tr>
                         <th class="border-right rounded" scope=" row">
                             <div class="username pt-2 text-center text-secondary"><?php echo $author['username']; ?></div>
@@ -167,21 +216,51 @@ if (isset($_POST['send_message'])) {
                                 <small class="text-secondary font-italic">Posted : <?php echo $topic_message['creation_date']; ?>
                                 </small>
                                 <?php if (isset($topic_message['edition_date'])) { ?> <small class="text-secondary font-italic pl-5">
-                                        Edited : 20/02/2020
+                                        Edited : <?php echo $topic_message['edition_date']; ?>
                                     </small>
                                 <?php } ?>
                                 <div class="pl-5 d-flex justify-content-end">
-                                    <?php if ($_SESSION['idusers'] === $topic_message['users_idusers']) { ?>
-                                        <a href="#"> <i class="text-right text-primary fa fa-pencil fa-lg"></i></a>
-                                        <a href="#"> <i class="pl-5 text-danger fa fa-trash-o fa-lg"></i></a>
-                                    <?php } ?>
+                                    <?php
+                                    if ($_SESSION['idusers'] === $topic_message['users_idusers']) { ?>
+                                        <?php
+                                        if ($topic_message['deleted'] == false) { ?>
+                                            <?php
+                                            if ($last_message['idmessages'] === $topic_message['idmessages']) { ?>
+                                                <form action="topic.php?idtopic=<?php echo $topic_id; ?>" method="POST">
+                                                    <button type="submit" name="edit_message" value="<?php echo $topic_message['idmessages']; ?>"><i class="text-right text-primary fa fa-pencil fa-lg"></i></button>
+                                                </form>
+                                            <?php
+                                            } ?>
+                                            <form action="topic.php?idtopic=<?php echo $topic_id; ?>" method="POST">
+                                                <button type="submit" name="delete_message" value="<?php echo $topic_message['idmessages']; ?>"><i class="pl-5 text-danger fa fa-trash-o fa-lg"></i></button>
+                                            </form>
+                                        <?php
+                                        } ?>
+                                    <?php
+                                    } ?>
                                 </div>
 
                             </div>
                             <div class="text-break pt-3 pb-5 font-weight-normal border-bottom">
                                 <?php
-                                $parsedown = new Parsedown();
-                                echo $parsedown->text($topic_message['content']);
+                                if ($topic_message['deleted'] == false) { ?>
+                                    <?php if ($_POST['edit_message'] == $topic_message['idmessages']) { ?>
+                                        <form action="topic.php?idtopic=<?php echo $topic_id; ?>" method="POST" class="emoji-picker-container">
+                                            <textarea type="text" data-emojiable="true" name="new_content" class="text-break" cols="30" rows="10"><?php echo $topic_message['content']; ?></textarea>
+                                            <!-- J'ai delete le id="editor" du textarea pour éviter les conflits avec emoji-picker -->
+                                            <br>
+                                            <div class="position pb-5 d-flex justify-content-center">
+                                                <button name="send_message_edited" value="<?php echo $topic_message['idmessages']; ?>" class="btn-primary btn-sm mx-auto mt-2" style="width:30%" type="submit"><a class="text-white font-weight-bold text-decoration-none">Send changes</a> </button>
+                                            </div>
+                                        </form>
+                                    <?php
+                                    } else {
+                                        $parsedown = new Parsedown();
+                                        echo $parsedown->text($topic_message['content']);
+                                    } ?>
+                                <?php } else {
+                                    echo "This message has been deleted by his author.";
+                                }
                                 ?>
                             </div>
                             <small class="text-secondary font-italic">
@@ -195,19 +274,20 @@ if (isset($_POST['send_message'])) {
                 <?php } ?>
             </tbody>
         </table>
-
-        <div id="test" class="pt-5 bg-light position  d-flex justify-content-center">
-            <div class="pl-5 w-50 text-break bg-light">
-                <form action="" method="POST" class="emoji-picker-container">
-                    <textarea data-emojiable="true" name="new_message" class="text-break" placeholder="Write your message here.." cols="30" rows="10"></textarea>
-                    <!-- J'ai delete le id="editor" du textarea pour éviter les conflits avec emoji-picker -->
-                    <br>
-                    <div class=" position pb-5 d-flex justify-content-center">
-                        <button name="send_message" class="btn-primary btn-sm mx-auto mt-2" style="width:30%" type="submit"><a class="text-white font-weight-bold text-decoration-none">Submit</a> </button>
-                    </div>
-                </form>
+        <?php if ($last_message['users_idusers'] != $_SESSION['idusers']) { ?>
+            <div id="test" class="pt-5 bg-light position  d-flex justify-content-center">
+                <div class="pl-5 w-50 text-break bg-light">
+                    <form action="" method="POST" class="emoji-picker-container">
+                        <textarea data-emojiable="true" name="new_message" class="text-break" placeholder="Write your message here.." cols="30" rows="10"></textarea>
+                        <!-- J'ai delete le id="editor" du textarea pour éviter les conflits avec emoji-picker -->
+                        <br>
+                        <div class=" position pb-5 d-flex justify-content-center">
+                            <button name="send_message" class="btn-primary btn-sm mx-auto mt-2" style="width:30%" type="submit"><a class="text-white font-weight-bold text-decoration-none">Submit</a> </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        <?php } ?>
     </div>
     <div>
         <?php require "footer.php" ?>

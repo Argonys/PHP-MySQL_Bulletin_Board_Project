@@ -123,7 +123,7 @@ if (isset($_POST['register'])) {
             $req->execute();
             $user_data = $req->fetch(PDO::FETCH_ASSOC);
             $_SESSION = $user_data;
-            $_SESSION['logged_in'] = "Bienvenue sur notre forum ! Vous êtes maintenant connecté.";
+            $_SESSION['logged_in'] = true;
             header("location: index.php");
         } else {
             echo "Something went wrong. Please try again later.";

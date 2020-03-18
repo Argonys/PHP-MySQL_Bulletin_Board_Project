@@ -149,7 +149,6 @@ if (isset($_POST['new_topic'])) {
             <div class="container">
                 <div class="row">
                     <?php
-                    var_dump($board_topics);
                     foreach ($board_topics as $board_topic) {
                         // Requête pour récupérer l'username de l'auteur du topic
                         $sqlGetAuthor = 'SELECT username FROM users
